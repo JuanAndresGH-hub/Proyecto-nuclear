@@ -1,0 +1,126 @@
+{% extends 'base.html' %}
+
+{% block title %}Registro de Evidencias - Sistema de Gestión de Prácticas{% endblock %}
+
+{% block topbar_title %}Registro de Evidencias{% endblock %}
+
+{% block content %}
+<div class="page-header">
+    <h1><i class="fas fa-file-upload"></i> Registro de Evidencias</h1>
+    <p>Subir documentos, informes y evidencias de tu práctica</p>
+</div>
+
+<div class="row">
+    <div class="col-lg-8">
+        <div class="card">
+            <div class="card-header">
+                <h5 class="mb-0"><i class="fas fa-plus"></i> Nueva Evidencia</h5>
+            </div>
+            <div class="card-body">
+                <form method="POST" enctype="multipart/form-data">
+                    {% csrf_token %}
+                    <div class="form-group mb-3">
+                        <label class="form-label">Tipo de Evidencia *</label>
+                        <select class="form-control" required>
+                            <option value="">Selecciona tipo...</option>
+                            <option value="informe">Informe Parcial</option>
+                            <option value="foto">Evidencias Fotográficas</option>
+                            <option value="certificado">Certificados</option>
+                            <option value="documento">Documento</option>
+                            <option value="otro">Otro</option>
+                        </select>
+                    </div>
+
+                    <div class="form-group mb-3">
+                        <label class="form-label">Descripción</label>
+                        <textarea class="form-control" rows="3" placeholder="Describe la evidencia..."></textarea>
+                    </div>
+
+                    <div class="form-group mb-3">
+                        <label class="form-label">Archivo *</label>
+                        <div class="input-group">
+                            <input type="file" class="form-control" accept=".pdf,.doc,.docx,.jpg,.png,.zip">
+                            <button class="btn btn-outline-secondary" type="button">Examinar</button>
+                        </div>
+                        <small class="text-muted">Formatos permitidos: PDF, DOC, DOCX, JPG, PNG, ZIP (máx 10MB)</small>
+                    </div>
+
+                    <button type="submit" class="btn btn-primary"><i class="fas fa-upload"></i> Subir Evidencia</button>
+                </form>
+            </div>
+        </div>
+    </div>
+
+    <div class="col-lg-4">
+        <div class="card">
+            <div class="card-header">
+                <h5 class="mb-0">Información</h5>
+            </div>
+            <div class="card-body">
+                <h6>¿Qué debes subir?</h6>
+                <ul style="font-size: 0.9rem;">
+                    <li>Informes parciales de tu práctica</li>
+                    <li>Fotografías de tus actividades</li>
+                    <li>Certificados y constancias</li>
+                    <li>Documentos relevantes</li>
+                    <li>Proyectos desarrollados</li>
+                </ul>
+            </div>
+        </div>
+    </div>
+</div>
+
+<div class="card mt-4">
+    <div class="card-header">
+        <h5 class="mb-0">Evidencias Registradas</h5>
+    </div>
+    <div class="card-body">
+        <div class="table-responsive">
+            <table class="table table-hover">
+                <thead style="background-color: #f5f7fa;">
+                    <tr>
+                        <th>Tipo</th>
+                        <th>Archivo</th>
+                        <th>Fecha</th>
+                        <th>Estado</th>
+                        <th>Acciones</th>
+                    </tr>
+                </thead>
+                <tbody>
+                    <tr>
+                        <td><span class="badge bg-info">Informe</span></td>
+                        <td><i class="fas fa-file-pdf"></i> Avance semana 1-4.pdf</td>
+                        <td>2025-11-15</td>
+                        <td><span class="badge badge-status active">Aprobado</span></td>
+                        <td>
+                            <a href="#" class="btn btn-sm btn-link"><i class="fas fa-eye"></i></a>
+                            <a href="#" class="btn btn-sm btn-link"><i class="fas fa-download"></i></a>
+                        </td>
+                    </tr>
+                    <tr>
+                        <td><span class="badge bg-secondary">Bitácora</span></td>
+                        <td><i class="fas fa-file-pdf"></i> Bitacora-2025-11-18.pdf</td>
+                        <td>2025-11-18</td>
+                        <td><span class="badge badge-status pending">Pendiente</span></td>
+                        <td>
+                            <a href="#" class="btn btn-sm btn-link"><i class="fas fa-eye"></i></a>
+                            <a href="#" class="btn btn-sm btn-link"><i class="fas fa-download"></i></a>
+                        </td>
+                    </tr>
+                    <tr>
+                        <td><span class="badge bg-success">Evidencias</span></td>
+                        <td><i class="fas fa-file-archive"></i> Fotos-actividades.zip</td>
+                        <td>2025-11-20</td>
+                        <td><span class="badge badge-status pending">Pendiente</span></td>
+                        <td>
+                            <a href="#" class="btn btn-sm btn-link"><i class="fas fa-eye"></i></a>
+                            <a href="#" class="btn btn-sm btn-link"><i class="fas fa-download"></i></a>
+                        </td>
+                    </tr>
+                </tbody>
+            </table>
+        </div>
+    </div>
+</div>
+{% endblock %}
+

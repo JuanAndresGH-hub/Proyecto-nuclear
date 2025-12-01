@@ -1,0 +1,412 @@
+/* ============================================
+   ANIMACIONES SUTILES Y EFECTOS FLUIDOS
+   ============================================ */
+
+/* Animaciones de carga */
+@keyframes fadeInDown {
+    from {
+        opacity: 0;
+        transform: translateY(-20px);
+    }
+    to {
+        opacity: 1;
+        transform: translateY(0);
+    }
+}
+
+@keyframes fadeInUp {
+    from {
+        opacity: 0;
+        transform: translateY(20px);
+    }
+    to {
+        opacity: 1;
+        transform: translateY(0);
+    }
+}
+
+@keyframes slideInLeft {
+    from {
+        opacity: 0;
+        transform: translateX(-30px);
+    }
+    to {
+        opacity: 1;
+        transform: translateX(0);
+    }
+}
+
+@keyframes slideInRight {
+    from {
+        opacity: 0;
+        transform: translateX(30px);
+    }
+    to {
+        opacity: 1;
+        transform: translateX(0);
+    }
+}
+
+@keyframes scaleIn {
+    from {
+        opacity: 0;
+        transform: scale(0.95);
+    }
+    to {
+        opacity: 1;
+        transform: scale(1);
+    }
+}
+
+@keyframes rotateIn {
+    from {
+        opacity: 0;
+        transform: rotate(-5deg);
+    }
+    to {
+        opacity: 1;
+        transform: rotate(0deg);
+    }
+}
+
+/* Pulse suave */
+@keyframes gentlePulse {
+    0%, 100% {
+        opacity: 1;
+    }
+    50% {
+        opacity: 0.8;
+    }
+}
+
+/* Glow suave */
+@keyframes softGlow {
+    0%, 100% {
+        box-shadow: 0 4px 12px rgba(0, 0, 0, 0.08);
+    }
+    50% {
+        box-shadow: 0 6px 16px rgba(0, 0, 0, 0.12);
+    }
+}
+
+/* Animaciones de hover para cards */
+.card {
+    animation: fadeInUp 0.5s ease-out;
+}
+
+/* Animaciones para botones */
+.btn {
+    animation: fadeInUp 0.4s ease-out;
+    animation-fill-mode: both;
+}
+
+.btn:hover {
+    animation: softGlow 0.3s ease-in-out forwards;
+}
+
+/* Animaciones para inputs */
+.form-control {
+    animation: fadeInUp 0.4s ease-out;
+    animation-fill-mode: both;
+}
+
+.form-control:focus {
+    animation: softGlow 0.3s ease-in-out forwards;
+}
+
+/* Animaciones para alertas */
+.alert {
+    animation: slideInUp 0.4s cubic-bezier(0.34, 1.56, 0.64, 1);
+}
+
+/* Animaciones para badges */
+.badge {
+    animation: scaleIn 0.3s ease-out;
+}
+
+/* Animaciones para iconos */
+i.fas {
+    transition: all 0.3s cubic-bezier(0.34, 1.56, 0.64, 1);
+}
+
+/* Efecto hover en iconos */
+.btn i, .card i, a i {
+    transition: transform 0.3s cubic-bezier(0.34, 1.56, 0.64, 1);
+}
+
+.btn:hover i, .card:hover i {
+    transform: translateY(-2px);
+}
+
+/* Animaciones para la barra lateral */
+.sidebar {
+    animation: slideInLeft 0.5s ease-out;
+}
+
+/* Animaciones para el topbar */
+.topbar {
+    animation: fadeInDown 0.5s ease-out;
+}
+
+/* Animaciones para items del menú */
+.sidebar-nav a {
+    animation: fadeInUp 0.4s ease-out;
+    animation-fill-mode: both;
+}
+
+.sidebar-nav li:nth-child(1) a { animation-delay: 0.1s; }
+.sidebar-nav li:nth-child(2) a { animation-delay: 0.2s; }
+.sidebar-nav li:nth-child(3) a { animation-delay: 0.3s; }
+.sidebar-nav li:nth-child(4) a { animation-delay: 0.4s; }
+.sidebar-nav li:nth-child(5) a { animation-delay: 0.5s; }
+.sidebar-nav li:nth-child(6) a { animation-delay: 0.6s; }
+
+/* Animaciones para el contenido */
+.page-header {
+    animation: fadeInDown 0.5s ease-out;
+}
+
+.content-area > div:first-child {
+    animation: fadeInUp 0.6s ease-out;
+}
+
+/* Efecto de transición suave en las páginas */
+@keyframes pageTransition {
+    from {
+        opacity: 0;
+        transform: translateY(10px);
+    }
+    to {
+        opacity: 1;
+        transform: translateY(0);
+    }
+}
+
+.content-area {
+    animation: pageTransition 0.5s ease-out;
+}
+
+/* Animaciones de carga para skeleton */
+@keyframes skeleton-loading {
+    0% {
+        background-color: #f0f0f0;
+    }
+    50% {
+        background-color: #e0e0e0;
+    }
+    100% {
+        background-color: #f0f0f0;
+    }
+}
+
+.skeleton {
+    animation: skeleton-loading 1.5s infinite;
+}
+
+/* Transición suave para cambios de estado */
+input:focus,
+select:focus,
+textarea:focus {
+    transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1);
+}
+
+/* Efecto ripple en botones (opcional, requiere JavaScript) */
+.btn.ripple::after {
+    content: '';
+    position: absolute;
+    top: 50%;
+    left: 50%;
+    width: 0;
+    height: 0;
+    border-radius: 50%;
+    background: rgba(255, 255, 255, 0.5);
+    transform: translate(-50%, -50%);
+    animation: ripple-effect 0.6s ease-out;
+}
+
+@keyframes ripple-effect {
+    0% {
+        width: 0;
+        height: 0;
+        opacity: 1;
+    }
+    100% {
+        width: 300px;
+        height: 300px;
+        opacity: 0;
+    }
+}
+
+/* Animaciones para elementos con hover */
+.hoverable {
+    transition: all 0.3s cubic-bezier(0.34, 1.56, 0.64, 1);
+}
+
+.hoverable:hover {
+    transform: translateY(-4px);
+    box-shadow: 0 8px 24px rgba(0, 0, 0, 0.12);
+}
+
+/* Animación de carga de página */
+.page-loading {
+    animation: fadeIn 0.5s ease-out;
+}
+
+@keyframes fadeIn {
+    from {
+        opacity: 0;
+    }
+    to {
+        opacity: 1;
+    }
+}
+
+/* Efectos de escritura suave */
+@keyframes typewriter {
+    from {
+        opacity: 0;
+        width: 0;
+    }
+    to {
+        opacity: 1;
+        width: 100%;
+    }
+}
+
+/* Scroll suave */
+html {
+    scroll-behavior: smooth;
+}
+
+/* Transiciones suaves en colores */
+a, button, input, select, textarea {
+    transition: color 0.3s ease, background-color 0.3s ease, border-color 0.3s ease;
+}
+
+/* Animación de entrada para modales */
+.modal-backdrop {
+    animation: fadeIn 0.3s ease-out;
+}
+
+.modal-content {
+    animation: scaleIn 0.3s cubic-bezier(0.34, 1.56, 0.64, 1);
+}
+
+/* Efecto de enfoque suave */
+:focus-visible {
+    outline: 2px solid #212529;
+    outline-offset: 2px;
+}
+
+/* Animaciones para breadcrumb */
+.breadcrumb {
+    animation: fadeInUp 0.4s ease-out;
+}
+
+.breadcrumb-item {
+    animation: fadeInUp 0.4s ease-out;
+    animation-fill-mode: both;
+}
+
+.breadcrumb-item:nth-child(1) { animation-delay: 0.1s; }
+.breadcrumb-item:nth-child(2) { animation-delay: 0.2s; }
+.breadcrumb-item:nth-child(3) { animation-delay: 0.3s; }
+
+/* Animación para tables */
+table tbody tr {
+    animation: fadeInUp 0.4s ease-out;
+    animation-fill-mode: both;
+}
+
+table tbody tr:nth-child(1) { animation-delay: 0.05s; }
+table tbody tr:nth-child(2) { animation-delay: 0.1s; }
+table tbody tr:nth-child(3) { animation-delay: 0.15s; }
+table tbody tr:nth-child(4) { animation-delay: 0.2s; }
+table tbody tr:nth-child(5) { animation-delay: 0.25s; }
+
+/* Efecto de flotación suave para elementos destacados */
+.floating {
+    animation: float 3s ease-in-out infinite;
+}
+
+@keyframes float {
+    0%, 100% {
+        transform: translateY(0px);
+    }
+    50% {
+        transform: translateY(-10px);
+    }
+}
+
+/* Smooth transitions para modales y dropdowns */
+.dropdown-menu {
+    animation: fadeInUp 0.2s ease-out;
+}
+
+.tooltip {
+    animation: fadeIn 0.2s ease-out;
+}
+
+/* Animación de barra de carga */
+.progress-bar {
+    transition: width 0.6s ease;
+}
+
+/* Animación de spinner de carga */
+.spinner-border {
+    animation: spin 1s linear infinite;
+}
+
+@keyframes spin {
+    0% {
+        transform: rotate(0deg);
+    }
+    100% {
+        transform: rotate(360deg);
+    }
+}
+
+/* Efecto de brillo en elementos */
+.shine {
+    background: linear-gradient(
+        90deg,
+        transparent,
+        rgba(255, 255, 255, 0.3),
+        transparent
+    );
+    background-size: 200% 100%;
+    animation: shine 2s infinite;
+}
+
+@keyframes shine {
+    0% {
+        background-position: -200% center;
+    }
+    100% {
+        background-position: 200% center;
+    }
+}
+
+/* Animaciones responsivas */
+@media (max-width: 768px) {
+    .sidebar {
+        animation: slideInLeft 0.3s ease-out;
+    }
+
+    .page-header {
+        animation: fadeInDown 0.3s ease-out;
+    }
+
+    .card {
+        animation: fadeInUp 0.3s ease-out;
+    }
+}
+
+/* Reduce animaciones si el usuario prefiere movimiento reducido */
+@media (prefers-reduced-motion: reduce) {
+    * {
+        animation: none !important;
+        transition: none !important;
+    }
+}
+

@@ -1,0 +1,269 @@
+{% extends 'base.html' %}
+{% load static %}
+
+{% block title %}{{ empresa.nombre }} - Detalle de Empresa{% endblock %}
+
+{% block topbar_title %}Detalle de Empresa{% endblock %}
+
+{% block extra_css %}
+<style>
+.info-box {
+    background-color: #f8f9fa;
+    padding: 15px;
+    border-radius: 8px;
+    margin-bottom: 15px;
+}
+.vacante-card {
+    transition: all 0.3s ease;
+    border: 1px solid #e9ecef;
+}
+.vacante-card:hover {
+    transform: translateY(-3px);
+    box-shadow: 0 4px 12px rgba(0,0,0,0.1);
+}
+</style>
+{% endblock %}
+
+{% block content %}
+<div class="page-header">
+    <div class="d-flex justify-content-between align-items-center">
+        <div>
+            <h1><i class="fas fa-building"></i> {{ empresa.nombre }}</h1>
+            <p style="color: #6c757d; margin: 0;">Información completa de la empresa</p>
+        </div>
+        {% if user.rol == 'COORDINADOR' %}
+        <div>
+            <a href="{% url 'empresas:empresa_edit' empresa.pk %}" class="btn btn-outline-dark">
+                <i class="fas fa-edit"></i> Editar Empresa
+            </a>
+        </div>
+        {% endif %}
+    </div>
+</div>
+
+<!-- Información General -->
+<div class="row mb-4">
+    <div class="col-md-8">
+        <div class="card">
+            <div class="card-header" style="background: linear-gradient(135deg, #667eea 0%, #764ba2 100%); color: white;">
+                <h5 class="mb-0" style="font-weight: 600;"><i class="fas fa-info-circle"></i> Información de la Empresa</h5>
+            </div>
+            <div class="card-body">
+                <div class="row">
+                    <div class="col-md-6">
+                        <div class="info-box">
+                            <small style="color: #6c757d; font-weight: 500; display: block; margin-bottom: 5px;">
+                                <i class="fas fa-id-card" style="color: #0dcaf0;"></i> NIT
+                            </small>
+                            <p style="margin: 0; font-weight: 600; font-size: 1.1rem;">{{ empresa.nit }}</p>
+                        </div>
+                    </div>
+                    <div class="col-md-6">
+                        <div class="info-box">
+                            <small style="color: #6c757d; font-weight: 500; display: block; margin-bottom: 5px;">
+                                <i class="fas fa-map-marker-alt" style="color: #198754;"></i> Ciudad
+                            </small>
+                            <p style="margin: 0; font-weight: 600; font-size: 1.1rem;">{{ empresa.ciudad|default:"No especificada" }}</p>
+                        </div>
+                    </div>
+                    <div class="col-md-6">
+                        <div class="info-box">
+                            <small style="color: #6c757d; font-weight: 500; display: block; margin-bottom: 5px;">
+                                <i class="fas fa-phone" style="color: #ffc107;"></i> Teléfono
+                            </small>
+                            <p style="margin: 0; font-weight: 600; font-size: 1.1rem;">{{ empresa.telefono|default:"No disponible" }}</p>
+                        </div>
+                    </div>
+                    <div class="col-md-6">
+                        <div class="info-box">
+                            <small style="color: #6c757d; font-weight: 500; display: block; margin-bottom: 5px;">
+                                <i class="fas fa-envelope" style="color: #dc3545;"></i> Correo Electrónico
+                            </small>
+                            <p style="margin: 0; font-weight: 600; font-size: 1.1rem;">
+                                <a href="mailto:{{ empresa.correo }}" style="color: #212529; text-decoration: none;">
+                                    {{ empresa.correo|default:"No disponible" }}
+                                </a>
+                            </p>
+                        </div>
+                    </div>
+                    {% if empresa.direccion %}
+                    <div class="col-12">
+                        <div class="info-box">
+                            <small style="color: #6c757d; font-weight: 500; display: block; margin-bottom: 5px;">
+                                <i class="fas fa-map-marked-alt" style="color: #6f42c1;"></i> Dirección
+                            </small>
+                            <p style="margin: 0; font-weight: 500;">{{ empresa.direccion }}</p>
+                        </div>
+                    </div>
+                    {% endif %}
+                </div>
+
+                {% if empresa.descripcion %}
+                <hr style="margin: 20px 0;">
+                <div>
+                    <h6 style="font-weight: 600; color: #212529; margin-bottom: 10px;">
+                        <i class="fas fa-align-left" style="color: #0dcaf0;"></i> Descripción de la Empresa
+                    </h6>
+                    <p style="color: #6c757d; line-height: 1.8; text-align: justify;">{{ empresa.descripcion }}</p>
+                </div>
+                {% endif %}
+            </div>
+        </div>
+    </div>
+
+    <div class="col-md-4">
+        <!-- Estadísticas de la Empresa -->
+        <div class="card mb-3" style="border-top: 3px solid #198754;">
+            <div class="card-body text-center">
+                <i class="fas fa-file-alt" style="font-size: 2.5rem; color: #198754; opacity: 0.8; margin-bottom: 10px;"></i>
+                <h2 style="font-size: 2.5rem; margin-bottom: 5px; color: #198754; font-weight: 700;">
+                    {{ empresa.vacantes.count }}
+                </h2>
+                <p style="margin: 0; color: #6c757d; font-weight: 500;">Vacantes Publicadas</p>
+            </div>
+        </div>
+
+        <div class="card mb-3" style="border-top: 3px solid #0dcaf0;">
+            <div class="card-body text-center">
+                <i class="fas fa-users" style="font-size: 2.5rem; color: #0dcaf0; opacity: 0.8; margin-bottom: 10px;"></i>
+                <h2 style="font-size: 2.5rem; margin-bottom: 5px; color: #0dcaf0; font-weight: 700;">
+                    {{ total_postulaciones }}
+                </h2>
+                <p style="margin: 0; color: #6c757d; font-weight: 500;">Postulaciones Totales</p>
+            </div>
+        </div>
+
+        <div class="card" style="border-top: 3px solid #6f42c1;">
+            <div class="card-body text-center">
+                <i class="fas fa-briefcase" style="font-size: 2.5rem; color: #6f42c1; opacity: 0.8; margin-bottom: 10px;"></i>
+                <h2 style="font-size: 2.5rem; margin-bottom: 5px; color: #6f42c1; font-weight: 700;">
+                    {{ practicas_activas }}
+                </h2>
+                <p style="margin: 0; color: #6c757d; font-weight: 500;">Prácticas Activas</p>
+            </div>
+        </div>
+    </div>
+</div>
+
+<!-- Vacantes de la Empresa -->
+<div class="card">
+    <div class="card-header d-flex justify-content-between align-items-center">
+        <h5 class="mb-0" style="font-weight: 600;">
+            <i class="fas fa-list"></i> Vacantes de {{ empresa.nombre }}
+        </h5>
+        {% if user.rol == 'COORDINADOR' %}
+        <a href="{% url 'empresas:vacante_create_from_empresa' empresa.pk %}" class="btn btn-dark btn-sm">
+            <i class="fas fa-plus"></i> Nueva Vacante
+        </a>
+        {% endif %}
+    </div>
+    <div class="card-body">
+        {% if empresa.vacantes.all %}
+            <div class="row">
+                {% for vacante in empresa.vacantes.all %}
+                <div class="col-md-6 mb-3">
+                    <div class="card vacante-card">
+                        <div class="card-body">
+                            <div class="d-flex justify-content-between align-items-start mb-2">
+                                <h6 style="font-weight: 600; color: #212529; flex: 1;">
+                                    <i class="fas fa-briefcase" style="color: #667eea;"></i> {{ vacante.titulo }}
+                                </h6>
+                                {% if vacante.estado == 'ACTIVA' %}
+                                    <span class="badge" style="background-color: #d1f0e3; color: #0f5130; font-size: 0.8rem;">
+                                        <i class="fas fa-check-circle"></i> Activa
+                                    </span>
+                                {% else %}
+                                    <span class="badge" style="background-color: #f8d7da; color: #842029; font-size: 0.8rem;">
+                                        <i class="fas fa-times-circle"></i> Cerrada
+                                    </span>
+                                {% endif %}
+                            </div>
+
+                            <p style="color: #6c757d; font-size: 0.9rem; margin-bottom: 10px; line-height: 1.5;">
+                                {{ vacante.descripcion|truncatewords:20 }}
+                            </p>
+
+                            <div class="mb-2">
+                                <small style="color: #6c757d;">
+                                    <i class="fas fa-map-marker-alt" style="color: #198754;"></i>
+                                    {{ vacante.modalidad }}
+                                </small>
+                                <span style="margin: 0 8px; color: #dee2e6;">|</span>
+                                <small style="color: #6c757d;">
+                                    <i class="fas fa-clock" style="color: #ffc107;"></i>
+                                    {{ vacante.duracion_meses }} meses
+                                </small>
+                            </div>
+
+                            <div class="mb-2">
+                                <small style="color: #6c757d;">
+                                    <i class="fas fa-users" style="color: #0dcaf0;"></i>
+                                    <strong>{{ vacante.postulaciones.count }}</strong> postulaciones
+                                </small>
+                                <span style="margin: 0 8px; color: #dee2e6;">|</span>
+                                <small style="color: #6c757d;">
+                                    <i class="fas fa-user-friends" style="color: #6f42c1;"></i>
+                                    {{ vacante.cantidad_plazas }} plazas
+                                </small>
+                            </div>
+
+                            <div class="mb-2">
+                                <small style="color: #6c757d;">
+                                    <i class="fas fa-calendar" style="color: #ffc107;"></i>
+                                    Creada: {{ vacante.fecha_creacion|date:"d M, Y" }}
+                                </small>
+                            </div>
+
+                            <div class="d-flex gap-2 mt-3">
+                                <a href="{% url 'empresas:vacante_detail' vacante.pk %}" class="btn btn-dark btn-sm flex-fill">
+                                    <i class="fas fa-eye"></i> Ver Detalles
+                                </a>
+                                {% if user.rol == 'COORDINADOR' %}
+                                <a href="{% url 'empresas:vacante_edit' vacante.pk %}" class="btn btn-dark btn-sm">
+                                    <i class="fas fa-edit"></i>
+                                </a>
+                                {% endif %}
+                            </div>
+                        </div>
+                    </div>
+                </div>
+                {% endfor %}
+            </div>
+        {% else %}
+            <div style="text-align: center; color: #6c757d; padding: 60px 20px;">
+                <i class="fas fa-briefcase" style="font-size: 3rem; color: #667eea; opacity: 0.3; margin-bottom: 20px; display: block;"></i>
+                <h6 style="color: #212529; margin-bottom: 10px;">No hay vacantes publicadas</h6>
+                <p style="margin-bottom: 20px;">Esta empresa aún no ha publicado vacantes.</p>
+                {% if user.rol == 'COORDINADOR' %}
+                <a href="{% url 'empresas:vacante_create_from_empresa' empresa.pk %}" class="btn btn-dark">
+                    <i class="fas fa-plus"></i> Publicar Primera Vacante
+                </a>
+                {% endif %}
+            </div>
+        {% endif %}
+    </div>
+</div>
+
+<div class="mt-4">
+    <a href="{% url 'empresas:empresas_list' %}" class="btn btn-dark">
+        <i class="fas fa-arrow-left"></i> Volver a Empresas
+    </a>
+</div>
+
+{% endblock %}
+
+{% block extra_js %}
+<script>
+// Efectos hover en tarjetas de vacantes
+document.querySelectorAll('.vacante-card').forEach(card => {
+    card.addEventListener('mouseenter', function() {
+        this.style.borderColor = '#667eea';
+    });
+
+    card.addEventListener('mouseleave', function() {
+        this.style.borderColor = '#e9ecef';
+    });
+});
+</script>
+{% endblock %}
+

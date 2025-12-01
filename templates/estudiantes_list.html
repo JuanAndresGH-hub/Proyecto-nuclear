@@ -1,0 +1,125 @@
+{% extends 'base.html' %}
+{% load static %}
+
+{% block title %}Gestión de Estudiantes - Sistema de Gestión de Prácticas{% endblock %}
+
+{% block topbar_title %}Gestión de Estudiantes{% endblock %}
+
+{% block content %}
+<div class="page-header">
+    <h1><i class="fas fa-users"></i> Gestión de Estudiantes</h1>
+    <p>Administra todos los estudiantes del sistema</p>
+</div>
+
+<!-- Estadísticas Rápidas -->
+<div class="row mb-4">
+    <div class="col-md-4">
+        <div class="card" style="border-top: 3px solid #0dcaf0;">
+            <div class="card-body text-center">
+                <h2 style="font-size: 2.5rem; margin-bottom: 10px; color: #0dcaf0;">
+                    {{ estudiantes.count }}
+                </h2>
+                <p style="margin: 0; color: #6c757d;">Total Estudiantes</p>
+            </div>
+        </div>
+    </div>
+    <div class="col-md-4">
+        <div class="card" style="border-top: 3px solid #198754;">
+            <div class="card-body text-center">
+                <h2 style="font-size: 2.5rem; margin-bottom: 10px; color: #198754;">
+                    {{ estudiantes|length }}
+                </h2>
+                <p style="margin: 0; color: #6c757d;">Con HV Aprobada</p>
+            </div>
+        </div>
+    </div>
+    <div class="col-md-4">
+        <div class="card" style="border-top: 3px solid #ffc107;">
+            <div class="card-body text-center">
+                <h2 style="font-size: 2.5rem; margin-bottom: 10px; color: #ffc107;">
+                    0
+                </h2>
+                <p style="margin: 0; color: #6c757d;">Con Prácticas Activas</p>
+            </div>
+        </div>
+    </div>
+</div>
+
+<!-- Lista de Estudiantes -->
+<div class="card">
+    <div class="card-header">
+        <h5 class="mb-0"><i class="fas fa-list"></i> Lista de Estudiantes</h5>
+    </div>
+    <div class="card-body">
+        {% if estudiantes %}
+            <div class="table-responsive">
+                <table class="table table-hover">
+                    <thead>
+                        <tr>
+                            <th>Nombre</th>
+                            <th>Programa</th>
+                            <th>Semestre</th>
+                            <th>Email</th>
+                            <th>HV</th>
+                            <th>Prácticas</th>
+                            <th>Acciones</th>
+                        </tr>
+                    </thead>
+                    <tbody>
+                        {% for estudiante in estudiantes %}
+                        <tr>
+                            <td>
+                                <strong>{{ estudiante.usuario.get_full_name }}</strong>
+                            </td>
+                            <td>{{ estudiante.programa_academico }}</td>
+                            <td class="text-center">{{ estudiante.semestre }}</td>
+                            <td>{{ estudiante.usuario.email }}</td>
+                            <td>
+                                {% if estudiante.estado_hv == 'APROBADA' %}
+                                    <span class="badge" style="background-color: #d1f0e3; color: #0f5130;">
+                                        <i class="fas fa-check"></i> Aprobada
+                                    </span>
+                                {% elif estudiante.estado_hv == 'PENDIENTE' %}
+                                    <span class="badge" style="background-color: #fff3cd; color: #664d03;">
+                                        <i class="fas fa-clock"></i> Pendiente
+                                    </span>
+                                {% elif estudiante.estado_hv == 'RECHAZADA' %}
+                                    <span class="badge" style="background-color: #f8d7da; color: #842029;">
+                                        <i class="fas fa-times"></i> Rechazada
+                                    </span>
+                                {% else %}
+                                    <span class="badge" style="background-color: #e9ecef; color: #6c757d;">
+                                        <i class="fas fa-question"></i> Sin cargar
+                                    </span>
+                                {% endif %}
+                            </td>
+                            <td class="text-center">
+                                {{ estudiante.practica_actual }}
+                            </td>
+                            <td>
+                                <a href="{% url 'usuarios:ver_documentos_estudiante' estudiante.id %}" class="btn btn-sm btn-dark">
+                                    <i class="fas fa-folder-open"></i> Ver Documentos
+                                </a>
+                            </td>
+                        </tr>
+                        {% endfor %}
+                    </tbody>
+                </table>
+            </div>
+        {% else %}
+            <p style="text-align: center; color: #6c757d; padding: 40px;">
+                <i class="fas fa-users" style="font-size: 3rem; opacity: 0.5; display: block; margin-bottom: 15px;"></i>
+                No hay estudiantes registrados aún.
+            </p>
+        {% endif %}
+    </div>
+</div>
+
+<div class="mt-4">
+    <a href="{% url 'dashboard_coordinador' %}" class="btn btn-dark">
+        <i class="fas fa-arrow-left"></i> Volver al Dashboard
+    </a>
+</div>
+
+{% endblock %}
+

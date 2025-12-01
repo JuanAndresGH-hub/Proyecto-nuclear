@@ -1,0 +1,448 @@
+{% extends 'base.html' %}
+
+{% block title %}Dashboard - Sistema de Gestión de Prácticas{% endblock %}
+
+{% block topbar_title %}Dashboard{% endblock %}
+
+{% block content %}
+<div class="page-header">
+    <h1><i class="fas fa-home"></i> Bienvenido, {{ user.first_name }}!</h1>
+    <p>Tu panel de control de prácticas empresariales</p>
+</div>
+
+{% if user.rol == 'ESTUDIANTE' %}
+    <!-- Estado de Hoja de Vida -->
+    <div class="row mb-4">
+        <div class="col-lg-4 col-md-6 mb-3">
+            <div class="card" style="border-top: 3px solid {% if perfil.estado_hv == 'APROBADA' %}#198754{% elif perfil.estado_hv == 'RECHAZADA' %}#dc3545{% else %}#ffc107{% endif %};">
+                <div class="card-body text-center">
+                    <h2 style="font-size: 2.5rem; margin-bottom: 10px;">
+                        {% if perfil.estado_hv == 'APROBADA' %}
+                            <i class="fas fa-check-circle" style="color: #198754;"></i>
+                        {% elif perfil.estado_hv == 'RECHAZADA' %}
+                            <i class="fas fa-times-circle" style="color: #dc3545;"></i>
+                        {% else %}
+                            <i class="fas fa-hourglass-half" style="color: #ffc107;"></i>
+                        {% endif %}
+                    </h2>
+                    <h5 style="margin-bottom: 8px; color: #212529;">Hoja de Vida</h5>
+                    <p class="text-muted" style="font-size: 0.9rem; margin-bottom: 15px;">
+                        {% if perfil.estado_hv == 'APROBADA' %}
+                            <span class="badge" style="background-color: #d1f0e3; color: #0f5130;">Aprobada</span>
+                        {% elif perfil.estado_hv == 'RECHAZADA' %}
+                            <span class="badge" style="background-color: #f8d7da; color: #842029;">Rechazada</span>
+                        {% else %}
+                            <span class="badge" style="background-color: #fff3cd; color: #664d03;">En revisión</span>
+                        {% endif %}
+                    </p>
+                    <button class="btn btn-sm btn-dark w-100" data-bs-toggle="modal" data-bs-target="#uploadCVModal">
+                        <i class="fas fa-upload"></i> {% if perfil.hv_archivo %}Actualizar{% else %}Cargar{% endif %}
+                    </button>
+                </div>
+            </div>
+        </div>
+
+        <div class="col-lg-4 col-md-6 mb-3">
+            <div class="card" style="border-top: 3px solid #0dcaf0;">
+                <div class="card-body text-center">
+                    <h2 style="font-size: 2.5rem; margin-bottom: 10px; color: #0dcaf0; opacity: 0.8;">
+                        <i class="fas fa-briefcase"></i>
+                    </h2>
+                    <h5 style="margin-bottom: 8px; color: #212529;">Práctica Actual</h5>
+                    <p class="text-muted" style="font-size: 0.9rem; margin-bottom: 15px;">
+                        <strong style="color: #212529; font-size: 1.2rem;">1</strong> de 5
+                    </p>
+                    <a href="#" class="btn btn-sm btn-dark w-100">
+                        <i class="fas fa-book"></i> Ver Prácticas
+                    </a>
+                </div>
+            </div>
+        </div>
+
+        <div class="col-lg-4 col-md-6 mb-3">
+            <div class="card" style="border-top: 3px solid #198754;">
+                <div class="card-body text-center">
+                    <h2 style="font-size: 2.5rem; margin-bottom: 10px; color: #198754; opacity: 0.8;">
+                        <i class="fas fa-book"></i>
+                    </h2>
+                    <h5 style="margin-bottom: 8px; color: #212529;">Semestre</h5>
+                    <p class="text-muted" style="font-size: 0.9rem; margin-bottom: 15px;">
+                        <strong style="color: #212529; font-size: 1.2rem;">{{ perfil.semestre }}</strong>
+                    </p>
+                    <a href="{% url 'usuarios:profile' %}" class="btn btn-sm btn-dark w-100">
+                        <i class="fas fa-edit"></i> Editar Perfil
+                    </a>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <!-- Acciones Rápidas -->
+    <div class="card mb-4">
+        <div class="card-header">
+            <h5 class="mb-0"><i class="fas fa-lightning-bolt"></i> Acciones Rápidas</h5>
+        </div>
+        <div class="card-body">
+            <div class="row">
+                <div class="col-md-3 col-sm-6 mb-3">
+                    <a href="{% url 'empresas:vacantes_list' %}" class="btn btn-dark w-100">
+                        <i class="fas fa-search"></i> Ver Vacantes
+                    </a>
+                </div>
+                <div class="col-md-3 col-sm-6 mb-3">
+                    <a href="#" class="btn btn-dark w-100">
+                        <i class="fas fa-file"></i> Documentación
+                    </a>
+                </div>
+                <div class="col-md-3 col-sm-6 mb-3">
+                    <a href="#" class="btn btn-dark w-100">
+                        <i class="fas fa-star"></i> Evaluaciones
+                    </a>
+                </div>
+                <div class="col-md-3 col-sm-6 mb-3">
+                    <a href="{% url 'usuarios:profile' %}" class="btn btn-dark w-100">
+                        <i class="fas fa-user"></i> Mi Perfil
+                    </a>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <!-- Próximas Actividades -->
+    <div class="row">
+        <div class="col-lg-8">
+            <div class="card">
+                <div class="card-header">
+                    <h5 class="mb-0"><i class="fas fa-calendar-alt"></i> Próximas Actividades</h5>
+                </div>
+                <div class="card-body">
+                    <div style="text-align: center; color: #6c757d; padding: 30px 0;">
+                        <i class="fas fa-inbox" style="font-size: 2rem; opacity: 0.5; margin-bottom: 10px; display: block;"></i>
+                        <p>No hay actividades programadas</p>
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        <div class="col-lg-4">
+            <div class="card">
+                <div class="card-header">
+                    <h5 class="mb-0"><i class="fas fa-bell"></i> Notificaciones</h5>
+                </div>
+                <div class="card-body">
+                    <div style="text-align: center; color: #6c757d; padding: 30px 0;">
+                        <i class="fas fa-bell-slash" style="font-size: 2rem; opacity: 0.5; margin-bottom: 10px; display: block;"></i>
+                        <p>Sin notificaciones</p>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <!-- Modal para Subir Hoja de Vida -->
+    <div class="modal fade" id="uploadCVModal" tabindex="-1" aria-labelledby="uploadCVModalLabel" aria-hidden="true">
+        <div class="modal-dialog modal-dialog-centered">
+            <div class="modal-content">
+                <div class="modal-header">
+                    <h5 class="modal-title" id="uploadCVModalLabel">
+                        <i class="fas fa-upload"></i> Subir Hoja de Vida
+                    </h5>
+                    <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
+                </div>
+                <form method="POST" action="{% url 'usuarios:upload_hoja_vida' perfil.id %}" enctype="multipart/form-data">
+                    {% csrf_token %}
+                    <div class="modal-body">
+                        <div class="form-group">
+                            <label for="cvFile" class="form-label">Seleccionar archivo (PDF o Word)</label>
+                            <input type="file" class="form-control" id="cvFile" name="archivo" accept=".pdf,.doc,.docx" required>
+                            <small class="text-muted">Formatos permitidos: PDF, DOC, DOCX (máx. 5MB)</small>
+                        </div>
+                        <div class="alert alert-info" role="alert">
+                            <i class="fas fa-info-circle"></i>
+                            <strong>Nota:</strong> Tu hoja de vida será revisada por el coordinador académico. Este proceso puede tomar 1-2 días hábiles.
+                        </div>
+                    </div>
+                    <div class="modal-footer">
+                        <button type="button" class="btn btn-outline-secondary" data-bs-dismiss="modal">
+                            <i class="fas fa-times"></i> Cancelar
+                        </button>
+                        <button type="submit" class="btn btn-dark">
+                            <i class="fas fa-upload"></i> Subir Archivo
+                        </button>
+                    </div>
+                </form>
+            </div>
+        </div>
+    </div>
+
+{% elif user.rol == 'DOCENTE' %}
+    <!-- Estadísticas del Docente -->
+    <div class="row mb-4">
+        <div class="col-lg-4 col-md-6 mb-3">
+            <div class="card" style="border-top: 3px solid #0dcaf0;">
+                <div class="card-body text-center">
+                    <h2 style="font-size: 2.5rem; margin-bottom: 10px; color: #0dcaf0; opacity: 0.8;">
+                        <i class="fas fa-users"></i>
+                    </h2>
+                    <h5 style="margin-bottom: 8px; color: #212529;">Estudiantes Asignados</h5>
+                    <p class="text-muted" style="font-size: 1.5rem; margin-bottom: 0; font-weight: 700; color: #212529;">
+                        {{ total_estudiantes|default:0 }}
+                    </p>
+                </div>
+            </div>
+        </div>
+
+        <div class="col-lg-4 col-md-6 mb-3">
+            <div class="card" style="border-top: 3px solid #198754;">
+                <div class="card-body text-center">
+                    <h2 style="font-size: 2.5rem; margin-bottom: 10px; color: #198754; opacity: 0.8;">
+                        <i class="fas fa-tasks"></i>
+                    </h2>
+                    <h5 style="margin-bottom: 8px; color: #212529;">Prácticas Activas</h5>
+                    <p class="text-muted" style="font-size: 1.5rem; margin-bottom: 0; font-weight: 700; color: #212529;">
+                        {{ practicas_activas|default:0 }}
+                    </p>
+                </div>
+            </div>
+        </div>
+
+        <div class="col-lg-4 col-md-6 mb-3">
+            <div class="card" style="border-top: 3px solid #ffc107;">
+                <div class="card-body text-center">
+                    <h2 style="font-size: 2.5rem; margin-bottom: 10px; color: #ffc107; opacity: 0.8;">
+                        <i class="fas fa-calendar-check"></i>
+                    </h2>
+                    <h5 style="margin-bottom: 8px; color: #212529;">Encuentros Pendientes</h5>
+                    <p class="text-muted" style="font-size: 1.5rem; margin-bottom: 0; font-weight: 700; color: #212529;">
+                        0
+                    </p>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <!-- Lista de Estudiantes Asignados -->
+    <div class="card">
+        <div class="card-header">
+            <h5 class="mb-0"><i class="fas fa-users"></i> Estudiantes Asignados</h5>
+        </div>
+        <div class="card-body">
+            {% if estudiantes_asignados %}
+                <p class="text-muted mb-3">Gestiona los estudiantes asignados a tu tutoría.</p>
+                <div class="table-responsive">
+                    <table class="table table-hover">
+                        <thead>
+                            <tr>
+                                <th>Estudiante</th>
+                                <th>Programa</th>
+                                <th>Semestre</th>
+                                <th>Práctica Actual</th>
+                                <th>Contacto</th>
+                                <th>Acciones</th>
+                            </tr>
+                        </thead>
+                        <tbody>
+                            {% for estudiante in estudiantes_asignados %}
+                            <tr>
+                                <td>
+                                    <strong>{{ estudiante.usuario.get_full_name }}</strong>
+                                </td>
+                                <td>{{ estudiante.programa_academico }}</td>
+                                <td class="text-center">{{ estudiante.semestre }}</td>
+                                <td class="text-center">
+                                    <span class="badge" style="background-color: #d1ecf1; color: #084298;">
+                                        Práctica {{ estudiante.practica_actual }}
+                                    </span>
+                                </td>
+                                <td>
+                                    <small>{{ estudiante.usuario.email }}</small>
+                                </td>
+                                <td>
+                                    <a href="{% url 'usuarios:ver_documentos_estudiante' estudiante.id %}" class="btn btn-sm btn-dark">
+                                        <i class="fas fa-folder-open"></i> Ver Documentos
+                                    </a>
+                                </td>
+                            </tr>
+                            {% endfor %}
+                        </tbody>
+                    </table>
+                </div>
+            {% else %}
+                <div style="text-align: center; color: #6c757d; padding: 60px 20px;">
+                    <i class="fas fa-users" style="font-size: 3rem; opacity: 0.5; margin-bottom: 20px; display: block;"></i>
+                    <h5 style="color: #212529; margin-bottom: 10px;">No hay estudiantes asignados</h5>
+                    <p>Aún no tienes estudiantes asignados a tu tutoría.</p>
+                </div>
+            {% endif %}
+        </div>
+    </div>
+
+{% elif user.rol == 'INSTRUCTOR' %}
+    <!-- Estadísticas del Instructor -->
+    <div class="row mb-4">
+        <div class="col-lg-4 col-md-6 mb-3">
+            <div class="card" style="border-top: 3px solid #0dcaf0;">
+                <div class="card-body text-center">
+                    <h2 style="font-size: 2.5rem; margin-bottom: 10px; color: #0dcaf0; opacity: 0.8;">
+                        <i class="fas fa-user-graduate"></i>
+                    </h2>
+                    <h5 style="margin-bottom: 8px; color: #212529;">Practicantes</h5>
+                    <p class="text-muted" style="font-size: 1.5rem; margin-bottom: 0; font-weight: 700; color: #212529;">
+                        {{ total_practicantes|default:0 }}
+                    </p>
+                </div>
+            </div>
+        </div>
+
+        <div class="col-lg-4 col-md-6 mb-3">
+            <div class="card" style="border-top: 3px solid #198754;">
+                <div class="card-body text-center">
+                    <h2 style="font-size: 2.5rem; margin-bottom: 10px; color: #198754; opacity: 0.8;">
+                        <i class="fas fa-tasks"></i>
+                    </h2>
+                    <h5 style="margin-bottom: 8px; color: #212529;">Prácticas Activas</h5>
+                    <p class="text-muted" style="font-size: 1.5rem; margin-bottom: 0; font-weight: 700; color: #212529;">
+                        {{ practicas_activas|default:0 }}
+                    </p>
+                </div>
+            </div>
+        </div>
+
+        <div class="col-lg-4 col-md-6 mb-3">
+            <div class="card" style="border-top: 3px solid #ffc107;">
+                <div class="card-body text-center">
+                    <h2 style="font-size: 2.5rem; margin-bottom: 10px; color: #ffc107; opacity: 0.8;">
+                        <i class="fas fa-star"></i>
+                    </h2>
+                    <h5 style="margin-bottom: 8px; color: #212529;">Evaluaciones Pendientes</h5>
+                    <p class="text-muted" style="font-size: 1.5rem; margin-bottom: 0; font-weight: 700; color: #212529;">
+                        0
+                    </p>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <!-- Lista de Practicantes -->
+    <div class="card">
+        <div class="card-header">
+            <h5 class="mb-0"><i class="fas fa-user-graduate"></i> Mis Practicantes</h5>
+        </div>
+        <div class="card-body">
+            {% if practicantes %}
+                <p class="text-muted mb-3">Gestiona los practicantes en tu empresa.</p>
+                <div class="table-responsive">
+                    <table class="table table-hover">
+                        <thead>
+                            <tr>
+                                <th>Practicante</th>
+                                <th>Programa</th>
+                                <th>Semestre</th>
+                                <th>Práctica Actual</th>
+                                <th>Contacto</th>
+                                <th>Acciones</th>
+                            </tr>
+                        </thead>
+                        <tbody>
+                            {% for practicante in practicantes %}
+                            <tr>
+                                <td>
+                                    <strong>{{ practicante.usuario.get_full_name }}</strong>
+                                </td>
+                                <td>{{ practicante.programa_academico }}</td>
+                                <td class="text-center">{{ practicante.semestre }}</td>
+                                <td class="text-center">
+                                    <span class="badge" style="background-color: #d1ecf1; color: #084298;">
+                                        Práctica {{ practicante.practica_actual }}
+                                    </span>
+                                </td>
+                                <td>
+                                    <small>{{ practicante.usuario.email }}</small>
+                                </td>
+                                <td>
+                                    <a href="{% url 'usuarios:ver_documentos_estudiante' practicante.id %}" class="btn btn-sm btn-dark">
+                                        <i class="fas fa-folder-open"></i> Ver Documentos
+                                    </a>
+                                </td>
+                            </tr>
+                            {% endfor %}
+                        </tbody>
+                    </table>
+                </div>
+            {% else %}
+                <div style="text-align: center; color: #6c757d; padding: 60px 20px;">
+                    <i class="fas fa-user-graduate" style="font-size: 3rem; opacity: 0.5; margin-bottom: 20px; display: block;"></i>
+                    <h5 style="color: #212529; margin-bottom: 10px;">No hay practicantes asignados</h5>
+                    <p>Aún no tienes practicantes asignados en tu empresa.</p>
+                </div>
+            {% endif %}
+        </div>
+    </div>
+
+{% elif user.rol == 'COORDINADOR' %}
+    <div class="row mb-4">
+        <div class="col-lg-3 col-md-6 mb-3">
+            <div class="card" style="border-top: 3px solid #212529;">
+                <div class="card-body text-center">
+                    <h2 style="font-size: 2.5rem; margin-bottom: 10px; color: #212529; opacity: 0.7;">
+                        <i class="fas fa-users"></i>
+                    </h2>
+                    <h5 style="margin-bottom: 8px; color: #212529;">Estudiantes</h5>
+                    <p class="text-muted" style="font-size: 1.5rem; margin-bottom: 15px; font-weight: 700; color: #212529;">0</p>
+                    <a href="#" class="btn btn-sm btn-dark w-100">
+                        <i class="fas fa-eye"></i> Ver
+                    </a>
+                </div>
+            </div>
+        </div>
+
+        <div class="col-lg-3 col-md-6 mb-3">
+            <div class="card" style="border-top: 3px solid #212529;">
+                <div class="card-body text-center">
+                    <h2 style="font-size: 2.5rem; margin-bottom: 10px; color: #212529; opacity: 0.7;">
+                        <i class="fas fa-briefcase"></i>
+                    </h2>
+                    <h5 style="margin-bottom: 8px; color: #212529;">Empresas</h5>
+                    <p class="text-muted" style="font-size: 1.5rem; margin-bottom: 15px; font-weight: 700; color: #212529;">0</p>
+                    <a href="#" class="btn btn-sm btn-dark w-100">
+                        <i class="fas fa-eye"></i> Ver
+                    </a>
+                </div>
+            </div>
+        </div>
+
+        <div class="col-lg-3 col-md-6 mb-3">
+            <div class="card" style="border-top: 3px solid #212529;">
+                <div class="card-body text-center">
+                    <h2 style="font-size: 2.5rem; margin-bottom: 10px; color: #212529; opacity: 0.7;">
+                        <i class="fas fa-file-alt"></i>
+                    </h2>
+                    <h5 style="margin-bottom: 8px; color: #212529;">Vacantes</h5>
+                    <p class="text-muted" style="font-size: 1.5rem; margin-bottom: 15px; font-weight: 700; color: #212529;">0</p>
+                    <a href="#" class="btn btn-sm btn-dark w-100">
+                        <i class="fas fa-eye"></i> Ver
+                    </a>
+                </div>
+            </div>
+        </div>
+
+        <div class="col-lg-3 col-md-6 mb-3">
+            <div class="card" style="border-top: 3px solid #212529;">
+                <div class="card-body text-center">
+                    <h2 style="font-size: 2.5rem; margin-bottom: 10px; color: #212529; opacity: 0.7;">
+                        <i class="fas fa-handshake"></i>
+                    </h2>
+                    <h5 style="margin-bottom: 8px; color: #212529;">Postulaciones</h5>
+                    <p class="text-muted" style="font-size: 1.5rem; margin-bottom: 15px; font-weight: 700; color: #212529;">0</p>
+                    <a href="#" class="btn btn-sm btn-dark w-100">
+                        <i class="fas fa-eye"></i> Ver
+                    </a>
+                </div>
+            </div>
+        </div>
+    </div>
+
+{% endif %}
+
+{% endblock %}
+

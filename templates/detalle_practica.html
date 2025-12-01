@@ -1,0 +1,204 @@
+{% extends 'base.html' %}
+
+{% block title %}Detalle Práctica - Sistema de Gestión de Prácticas{% endblock %}
+
+{% block topbar_title %}Detalle de Práctica{% endblock %}
+
+{% block content %}
+<div class="page-header">
+    <h1><i class="fas fa-graduation-cap"></i> Práctica {{ practica.numero }}</h1>
+    <p>Información detallada de tu práctica empresarial</p>
+</div>
+
+<!-- Información General -->
+<div class="card mb-4">
+    <div class="card-header">
+        <h5 class="mb-0"><i class="fas fa-info-circle"></i> Información General</h5>
+    </div>
+    <div class="card-body">
+        <div style="display: grid; grid-template-columns: repeat(auto-fit, minmax(250px, 1fr)); gap: 25px;">
+            <div>
+                <small style="color: #6c757d; display: block; margin-bottom: 8px;">
+                    <i class="fas fa-building"></i> Empresa
+                </small>
+                <p style="margin: 0; color: #212529; font-weight: 500;">
+                    {% if practica.vacante %}
+                        {{ practica.vacante.empresa.nombre }}
+                    {% else %}
+                        No asignada
+                    {% endif %}
+                </p>
+            </div>
+
+            <div>
+                <small style="color: #6c757d; display: block; margin-bottom: 8px;">
+                    <i class="fas fa-circle"></i> Estado
+                </small>
+                <span class="badge" style="
+                    {% if practica.estado == 'EN_CURSO' %}
+                        background-color: #cfe2ff; color: #084298;
+                    {% elif practica.estado == 'FINALIZADA' %}
+                        background-color: #d1f0e3; color: #0f5130;
+                    {% elif practica.estado == 'NO_INICIADA' %}
+                        background-color: #f8f9fa; color: #495057;
+                    {% elif practica.estado == 'REPROBADA' %}
+                        background-color: #f8d7da; color: #842029;
+                    {% endif %}
+                    padding: 8px 12px;">
+                    {{ practica.get_estado_display }}
+                </span>
+            </div>
+
+            <div>
+                <small style="color: #6c757d; display: block; margin-bottom: 8px;">
+                    <i class="fas fa-chart-bar"></i> Promedio Final
+                </small>
+                <h5 style="margin: 0; color: {% if promedio >= 3.5 %}#198754{% else %}#dc3545{% endif %};">
+                    {{ promedio|default:"Pendiente" }}{% if promedio %}/5.0{% endif %}
+                </h5>
+            </div>
+        </div>
+
+        <hr style="margin: 25px 0;">
+
+        <div style="display: grid; grid-template-columns: repeat(auto-fit, minmax(250px, 1fr)); gap: 25px;">
+            <div>
+                <small style="color: #6c757d; display: block; margin-bottom: 8px;">
+                    <i class="fas fa-calendar-alt"></i> Fecha Inicio
+                </small>
+                <p style="margin: 0; color: #212529;">
+                    {% if practica.fecha_inicio %}
+                        {{ practica.fecha_inicio|date:"d/m/Y" }}
+                    {% else %}
+                        Por definir
+                    {% endif %}
+                </p>
+            </div>
+
+            <div>
+                <small style="color: #6c757d; display: block; margin-bottom: 8px;">
+                    <i class="fas fa-calendar-check"></i> Fecha Fin
+                </small>
+                <p style="margin: 0; color: #212529;">
+                    {% if practica.fecha_fin %}
+                        {{ practica.fecha_fin|date:"d/m/Y" }}
+                    {% else %}
+                        Por definir
+                    {% endif %}
+                </p>
+            </div>
+
+            <div>
+                <small style="color: #6c757d; display: block; margin-bottom: 8px;">
+                    <i class="fas fa-chalkboard"></i> Docente Asesor
+                </small>
+                <p style="margin: 0; color: #212529;">
+                    {% if practica.docente_asesor %}
+                        {{ practica.docente_asesor.usuario.get_full_name }}
+                    {% else %}
+                        Sin asignar
+                    {% endif %}
+                </p>
+            </div>
+
+            <div>
+                <small style="color: #6c757d; display: block; margin-bottom: 8px;">
+                    <i class="fas fa-user-tie"></i> Instructor Empresarial
+                </small>
+                <p style="margin: 0; color: #212529;">
+                    {% if practica.instructor %}
+                        {{ practica.instructor.usuario.get_full_name }}
+                    {% else %}
+                        Sin asignar
+                    {% endif %}
+                </p>
+            </div>
+        </div>
+    </div>
+</div>
+
+<!-- Evaluaciones -->
+{% if evaluaciones %}
+    <div class="card mb-4">
+        <div class="card-header">
+            <h5 class="mb-0"><i class="fas fa-star"></i> Evaluaciones ({{ evaluaciones|length }})</h5>
+        </div>
+        <div class="card-body">
+            {% for evaluacion in evaluaciones %}
+                <div style="margin-bottom: 15px; padding: 12px; background: #f8f9fa; border-left: 3px solid #212529; border-radius: 4px;">
+                    <div class="d-flex justify-content-between">
+                        <div>
+                            <h6 style="margin: 0 0 5px 0; color: #212529;">
+                                {{ evaluacion.get_tipo_evaluador_display }}
+                            </h6>
+                            <small style="color: #6c757d;">{{ evaluacion.fecha_evaluacion|date:"d/m/Y H:i" }}</small>
+                        </div>
+                        <h5 style="margin: 0; color: {% if evaluacion.nota >= 3.5 %}#198754{% else %}#dc3545{% endif %};">
+                            {{ evaluacion.nota }}/5.0
+                        </h5>
+                    </div>
+                    {% if evaluacion.comentarios %}
+                        <p style="margin: 8px 0 0 0; color: #495057; font-size: 0.9rem;">{{ evaluacion.comentarios }}</p>
+                    {% endif %}
+                </div>
+            {% endfor %}
+        </div>
+    </div>
+{% endif %}
+
+<!-- Proyectos -->
+{% if proyectos %}
+    <div class="card mb-4">
+        <div class="card-header">
+            <h5 class="mb-0"><i class="fas fa-folder"></i> Proyectos ({{ proyectos|length }})</h5>
+        </div>
+        <div class="card-body">
+            {% for proyecto in proyectos %}
+                <div style="margin-bottom: 15px; padding: 12px; background: #f8f9fa; border-left: 3px solid #0dcaf0; border-radius: 4px;">
+                    <h6 style="margin: 0 0 8px 0; color: #212529;">{{ proyecto.nombre }}</h6>
+                    <p style="margin: 0; color: #6c757d; font-size: 0.9rem;">{{ proyecto.descripcion }}</p>
+                    {% if proyecto.fecha_entrega %}
+                        <small style="color: #495057; display: block; margin-top: 5px;">
+                            Entrega: {{ proyecto.fecha_entrega|date:"d/m/Y" }}
+                        </small>
+                    {% endif %}
+                </div>
+            {% endfor %}
+        </div>
+    </div>
+{% endif %}
+
+<!-- Encuentros Semanales -->
+{% if encuentros %}
+    <div class="card mb-4">
+        <div class="card-header">
+            <h5 class="mb-0"><i class="fas fa-calendar-alt"></i> Encuentros Semanales ({{ encuentros|length }})</h5>
+        </div>
+        <div class="card-body">
+            {% for encuentro in encuentros %}
+                <div style="margin-bottom: 15px; padding: 12px; background: #f8f9fa; border-left: 3px solid #198754; border-radius: 4px;">
+                    <h6 style="margin: 0 0 5px 0; color: #212529;">{{ encuentro.tema }}</h6>
+                    <small style="color: #6c757d;">{{ encuentro.fecha|date:"d/m/Y" }}</small>
+                    {% if encuentro.descripcion %}
+                        <p style="margin: 8px 0 0 0; color: #495057; font-size: 0.9rem;">{{ encuentro.descripcion }}</p>
+                    {% endif %}
+                </div>
+            {% endfor %}
+        </div>
+    </div>
+{% endif %}
+
+<!-- Observaciones -->
+{% if practica.observaciones %}
+    <div class="card">
+        <div class="card-header">
+            <h5 class="mb-0"><i class="fas fa-note-sticky"></i> Observaciones</h5>
+        </div>
+        <div class="card-body">
+            <p style="color: #495057; line-height: 1.6;">{{ practica.observaciones }}</p>
+        </div>
+    </div>
+{% endif %}
+
+{% endblock %}
+

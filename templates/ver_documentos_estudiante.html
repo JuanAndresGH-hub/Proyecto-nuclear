@@ -1,0 +1,234 @@
+{% extends 'base.html' %}
+{% load static %}
+
+{% block title %}Documentos de {{ estudiante.usuario.get_full_name }} - Sistema de Gestión de Prácticas{% endblock %}
+
+{% block topbar_title %}Documentos del Estudiante{% endblock %}
+
+{% block content %}
+<div class="page-header">
+    <h1><i class="fas fa-folder-open"></i> Documentos de {{ estudiante.usuario.get_full_name }}</h1>
+    <p>{{ estudiante.programa_academico }} - Semestre {{ estudiante.semestre }}</p>
+</div>
+
+<!-- Información del Estudiante -->
+<div class="card mb-4">
+    <div class="card-header">
+        <h5 class="mb-0"><i class="fas fa-user-graduate"></i> Información del Estudiante</h5>
+    </div>
+    <div class="card-body">
+        <div class="row">
+            <div class="col-md-3">
+                <small style="color: #6c757d; display: block; margin-bottom: 5px;">Nombre Completo</small>
+                <p style="margin: 0; font-weight: 500;">{{ estudiante.usuario.get_full_name }}</p>
+            </div>
+            <div class="col-md-3">
+                <small style="color: #6c757d; display: block; margin-bottom: 5px;">Programa</small>
+                <p style="margin: 0; font-weight: 500;">{{ estudiante.programa_academico }}</p>
+            </div>
+            <div class="col-md-2">
+                <small style="color: #6c757d; display: block; margin-bottom: 5px;">Semestre</small>
+                <p style="margin: 0; font-weight: 500;">{{ estudiante.semestre }}</p>
+            </div>
+            <div class="col-md-4">
+                <small style="color: #6c757d; display: block; margin-bottom: 5px;">Correo</small>
+                <p style="margin: 0; font-weight: 500;">{{ estudiante.usuario.email }}</p>
+            </div>
+        </div>
+    </div>
+</div>
+
+<!-- Resumen de Documentos -->
+<div class="row mb-4">
+    <div class="col-md-4">
+        <div class="card" style="border-top: 3px solid #0dcaf0;">
+            <div class="card-body text-center">
+                <h2 style="font-size: 2.5rem; margin-bottom: 10px; color: #0dcaf0; opacity: 0.8;">
+                    <i class="fas fa-file-alt"></i>
+                </h2>
+                <h5 style="margin-bottom: 8px; color: #212529;">Total Documentos</h5>
+                <p class="text-muted" style="font-size: 1.5rem; margin-bottom: 0; font-weight: 700; color: #212529;">
+                    {{ total_documentos }}
+                </p>
+            </div>
+        </div>
+    </div>
+
+    <div class="col-md-4">
+        <div class="card" style="border-top: 3px solid {% if hoja_vida.estado == 'APROBADA' %}#198754{% elif hoja_vida.estado == 'RECHAZADA' %}#dc3545{% else %}#ffc107{% endif %};">
+            <div class="card-body text-center">
+                <h2 style="font-size: 2.5rem; margin-bottom: 10px;">
+                    {% if hoja_vida %}
+                        {% if hoja_vida.estado == 'APROBADA' %}
+                            <i class="fas fa-check-circle" style="color: #198754;"></i>
+                        {% elif hoja_vida.estado == 'RECHAZADA' %}
+                            <i class="fas fa-times-circle" style="color: #dc3545;"></i>
+                        {% else %}
+                            <i class="fas fa-hourglass-half" style="color: #ffc107;"></i>
+                        {% endif %}
+                    {% else %}
+                        <i class="fas fa-file-upload" style="color: #6c757d; opacity: 0.5;"></i>
+                    {% endif %}
+                </h2>
+                <h5 style="margin-bottom: 8px; color: #212529;">Hoja de Vida</h5>
+                <p class="text-muted" style="font-size: 0.9rem; margin-bottom: 0;">
+                    {% if hoja_vida %}
+                        {% if hoja_vida.estado == 'APROBADA' %}
+                            <span class="badge" style="background-color: #d1f0e3; color: #0f5130;">Aprobada</span>
+                        {% elif hoja_vida.estado == 'RECHAZADA' %}
+                            <span class="badge" style="background-color: #f8d7da; color: #842029;">Rechazada</span>
+                        {% else %}
+                            <span class="badge" style="background-color: #fff3cd; color: #664d03;">En revisión</span>
+                        {% endif %}
+                    {% else %}
+                        <span class="badge" style="background-color: #e9ecef; color: #6c757d;">No cargada</span>
+                    {% endif %}
+                </p>
+            </div>
+        </div>
+    </div>
+
+    <div class="col-md-4">
+        <div class="card" style="border-top: 3px solid #198754;">
+            <div class="card-body text-center">
+                <h2 style="font-size: 2.5rem; margin-bottom: 10px; color: #198754; opacity: 0.8;">
+                    <i class="fas fa-book"></i>
+                </h2>
+                <h5 style="margin-bottom: 8px; color: #212529;">Práctica Actual</h5>
+                <p class="text-muted" style="font-size: 1.5rem; margin-bottom: 0; font-weight: 700; color: #212529;">
+                    {{ estudiante.practica_actual }}
+                </p>
+            </div>
+        </div>
+    </div>
+</div>
+
+<!-- Hoja de Vida -->
+{% if hoja_vida %}
+<div style="margin-bottom: 30px;">
+    <h5 style="margin-bottom: 15px; color: #212529;">
+        <i class="fas fa-id-card"></i> Hoja de Vida
+    </h5>
+    <div class="row">
+        <div class="col-md-6">
+            <div style="background: white; border-radius: 8px; border: 1px solid #e9ecef; overflow: hidden;">
+                <div style="padding: 20px; border-bottom: 1px solid #e9ecef;">
+                    <div style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 12px;">
+                        <h6 style="margin: 0; color: #212529; font-weight: 600;">
+                            <i class="fas fa-file-pdf" style="color: #dc3545;"></i> {{ hoja_vida.nombre }}
+                        </h6>
+                        <span class="badge" style="
+                            {% if hoja_vida.estado == 'APROBADA' %}
+                                background-color: #d1f0e3; color: #0f5130;
+                            {% elif hoja_vida.estado == 'RECHAZADA' %}
+                                background-color: #f8d7da; color: #842029;
+                            {% else %}
+                                background-color: #fff3cd; color: #664d03;
+                            {% endif %}
+                        ">
+                            {% if hoja_vida.estado == 'APROBADA' %}
+                                <i class="fas fa-check-circle"></i> Aprobada
+                            {% elif hoja_vida.estado == 'RECHAZADA' %}
+                                <i class="fas fa-times-circle"></i> Rechazada
+                            {% else %}
+                                <i class="fas fa-hourglass-half"></i> En revisión
+                            {% endif %}
+                        </span>
+                    </div>
+                    <p style="color: #6c757d; font-size: 0.9rem; margin: 12px 0;">
+                        <i class="fas fa-calendar"></i> Cargado el: {{ hoja_vida.fecha|date:"d/m/Y" }}
+                    </p>
+                </div>
+                <div style="border-top: 1px solid #e9ecef; padding: 15px;">
+                    <div class="d-flex gap-2">
+                        <a href="{{ hoja_vida.url }}" target="_blank" class="btn btn-sm btn-dark flex-grow-1">
+                            <i class="fas fa-eye"></i> Ver
+                        </a>
+                        <a href="{{ hoja_vida.url }}" download class="btn btn-sm btn-dark flex-grow-1">
+                            <i class="fas fa-download"></i> Descargar
+                        </a>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+{% else %}
+    <div class="alert alert-info">
+        <i class="fas fa-info-circle"></i> El estudiante aún no ha cargado su hoja de vida.
+    </div>
+{% endif %}
+
+<!-- Documentos de Prácticas -->
+{% if documentos %}
+    <div style="margin-bottom: 30px;">
+        <h5 style="margin-bottom: 15px; color: #212529;">
+            <i class="fas fa-folder"></i> Documentos de Prácticas
+        </h5>
+        <div class="row">
+        {% for doc in documentos %}
+            <div class="col-md-6 mb-3">
+                <div style="background: white; border-radius: 8px; border: 1px solid #e9ecef; overflow: hidden;">
+                    <div style="padding: 20px; border-bottom: 1px solid #e9ecef;">
+                        <h6 style="margin-bottom: 10px; color: #212529; font-weight: 600;">
+                            <i class="fas fa-project-diagram"></i> {{ doc.proyecto.titulo }}
+                        </h6>
+                        <p style="color: #6c757d; font-size: 0.9rem; margin: 8px 0;">
+                            <i class="fas fa-book"></i> Práctica {{ doc.practica.numero }}
+                        </p>
+                        {% if doc.proyecto.calificacion %}
+                            <div style="margin: 12px 0; padding: 12px; background: #f8f9fa; border-left: 3px solid #212529; border-radius: 4px;">
+                                <small style="color: #6c757d; display: block; margin-bottom: 5px;">Calificación</small>
+                                <h5 style="margin: 0; color: #212529;">{{ doc.proyecto.calificacion }}/5.0</h5>
+                            </div>
+                        {% endif %}
+                    </div>
+
+                    <div style="border-top: 1px solid #e9ecef; padding: 15px;">
+                        <div class="d-flex gap-2">
+                            {% if doc.proyecto.informe_final_archivo %}
+                                <a href="{{ doc.proyecto.informe_final_archivo.url }}" target="_blank" class="btn btn-sm btn-dark flex-grow-1">
+                                    <i class="fas fa-eye"></i> Ver
+                                </a>
+                                <a href="{{ doc.proyecto.informe_final_archivo.url }}" download class="btn btn-sm btn-dark flex-grow-1">
+                                    <i class="fas fa-download"></i> Descargar
+                                </a>
+                            {% elif doc.proyecto.registro_archivo %}
+                                <a href="{{ doc.proyecto.registro_archivo.url }}" target="_blank" class="btn btn-sm btn-dark flex-grow-1">
+                                    <i class="fas fa-eye"></i> Ver
+                                </a>
+                                <a href="{{ doc.proyecto.registro_archivo.url }}" download class="btn btn-sm btn-dark flex-grow-1">
+                                    <i class="fas fa-download"></i> Descargar
+                                </a>
+                            {% else %}
+                                <button class="btn btn-sm btn-secondary flex-grow-1" disabled>
+                                    <i class="fas fa-eye"></i> Sin archivo
+                                </button>
+                            {% endif %}
+                        </div>
+                    </div>
+                </div>
+            </div>
+        {% endfor %}
+        </div>
+    </div>
+{% endif %}
+
+{% if not hoja_vida and not documentos %}
+    <div class="alert alert-warning">
+        <i class="fas fa-exclamation-triangle"></i>
+        <strong>No hay documentos disponibles.</strong> El estudiante aún no ha cargado documentos.
+    </div>
+{% endif %}
+
+<div class="d-flex gap-3 mt-4">
+    <a href="{% url 'dashboard_docente' %}" class="btn btn-dark">
+        <i class="fas fa-arrow-left"></i> Volver al Dashboard
+    </a>
+    <a href="{% url 'practicas:practicas_list' %}" class="btn btn-dark">
+        <i class="fas fa-book"></i> Ver Prácticas
+    </a>
+</div>
+
+{% endblock %}
+

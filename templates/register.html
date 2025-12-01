@@ -1,0 +1,343 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Registro - Sistema de Gestión de Prácticas</title>
+
+    <!-- Bootstrap CSS -->
+    <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/css/bootstrap.min.css" rel="stylesheet">
+    <!-- Font Awesome -->
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+    <!-- Google Fonts -->
+    <link href="https://fonts.googleapis.com/css2?family=Segoe+UI:wght@300;400;600;700&display=swap" rel="stylesheet">
+
+    <style>
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+
+        html, body {
+            height: 100%;
+            width: 100%;
+        }
+
+        body {
+            font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', 'Roboto', sans-serif;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            background: linear-gradient(135deg, #f5f7fa 0%, #ffffff 100%);
+            min-height: 100vh;
+            padding: 20px 0;
+        }
+
+        .register-container {
+            background: #ffffff;
+            border-radius: 16px;
+            box-shadow: 0 20px 60px rgba(0, 0, 0, 0.08);
+            max-width: 550px;
+            width: 100%;
+            padding: 50px 40px;
+            animation: fadeIn 0.6s ease-out;
+        }
+
+        @keyframes fadeIn {
+            from {
+                opacity: 0;
+                transform: translateY(20px);
+            }
+            to {
+                opacity: 1;
+                transform: translateY(0);
+            }
+        }
+
+        .register-header {
+            text-align: center;
+            margin-bottom: 40px;
+        }
+
+        .register-header i {
+            font-size: 56px;
+            color: #495057;
+            display: block;
+            margin-bottom: 15px;
+            opacity: 0.8;
+            animation: float 3s ease-in-out infinite;
+        }
+
+        @keyframes float {
+            0%, 100% { transform: translateY(0px); }
+            50% { transform: translateY(-10px); }
+        }
+
+        .register-header h2 {
+            color: #212529;
+            font-weight: 700;
+            font-size: 1.8rem;
+            margin-bottom: 10px;
+        }
+
+        .register-header p {
+            color: #6c757d;
+            font-size: 0.95rem;
+        }
+
+        .form-group {
+            margin-bottom: 25px;
+            animation: slideInUp 0.4s ease-out;
+            animation-fill-mode: both;
+        }
+
+        @keyframes slideInUp {
+            from {
+                opacity: 0;
+                transform: translateY(10px);
+            }
+            to {
+                opacity: 1;
+                transform: translateY(0);
+            }
+        }
+
+        .form-group:nth-child(1) { animation-delay: 0.1s; }
+        .form-group:nth-child(2) { animation-delay: 0.2s; }
+        .form-group:nth-child(3) { animation-delay: 0.3s; }
+        .form-group:nth-child(4) { animation-delay: 0.4s; }
+        .form-group:nth-child(5) { animation-delay: 0.5s; }
+
+        .form-label {
+            font-weight: 600;
+            color: #212529;
+            margin-bottom: 10px;
+            display: block;
+            font-size: 0.95rem;
+        }
+
+        .form-control {
+            border: 2px solid #e9ecef;
+            border-radius: 8px;
+            padding: 12px 14px;
+            font-size: 0.95rem;
+            transition: all 0.3s ease;
+            background-color: #ffffff;
+            color: #212529;
+        }
+
+        .form-control::placeholder {
+            color: #adb5bd;
+        }
+
+        .form-control:focus {
+            border-color: #212529;
+            background-color: #ffffff;
+            box-shadow: 0 0 0 3px rgba(33, 37, 41, 0.04);
+            outline: none;
+        }
+
+        .form-text {
+            color: #6c757d;
+            font-size: 0.85rem;
+            margin-top: 5px;
+        }
+
+        .btn-register {
+            background: linear-gradient(135deg, #212529 0%, #495057 100%);
+            color: white;
+            border: none;
+            padding: 12px 20px;
+            border-radius: 8px;
+            font-weight: 600;
+            font-size: 1rem;
+            transition: all 0.3s ease;
+            width: 100%;
+            cursor: pointer;
+            box-shadow: 0 4px 12px rgba(33, 37, 41, 0.1);
+            margin-bottom: 15px;
+        }
+
+        .btn-register:hover {
+            transform: translateY(-2px);
+            box-shadow: 0 8px 20px rgba(33, 37, 41, 0.15);
+            color: white;
+        }
+
+        .btn-back {
+            background: white;
+            color: #495057;
+            border: 2px solid #dee2e6;
+            padding: 12px 20px;
+            border-radius: 8px;
+            font-weight: 600;
+            font-size: 1rem;
+            transition: all 0.3s ease;
+            width: 100%;
+            cursor: pointer;
+            text-align: center;
+            text-decoration: none;
+            display: block;
+        }
+
+        .btn-back:hover {
+            background: #f8f9fa;
+            border-color: #adb5bd;
+            color: #212529;
+            transform: translateY(-2px);
+        }
+
+        .alert {
+            border: none;
+            border-radius: 8px;
+            padding: 14px 16px;
+            margin-bottom: 20px;
+            animation: slideIn 0.3s ease-out;
+            border-left: 4px solid #dc3545;
+            background-color: #f8d7da;
+            color: #721c24;
+        }
+
+        @keyframes slideIn {
+            from {
+                opacity: 0;
+                transform: translateY(-10px);
+            }
+            to {
+                opacity: 1;
+                transform: translateY(0);
+            }
+        }
+
+        .form-row {
+            display: grid;
+            grid-template-columns: 1fr 1fr;
+            gap: 15px;
+        }
+
+        .form-row .form-group {
+            margin-bottom: 0;
+        }
+
+        @media (max-width: 480px) {
+            .register-container {
+                padding: 30px 20px;
+            }
+
+            .register-header i {
+                font-size: 48px;
+            }
+
+            .register-header h2 {
+                font-size: 1.5rem;
+            }
+
+            .form-control,
+            .btn-register,
+            .btn-back {
+                font-size: 0.9rem;
+                padding: 11px 12px;
+            }
+
+            .form-row {
+                grid-template-columns: 1fr;
+                gap: 0;
+            }
+
+            .form-row .form-group {
+                margin-bottom: 25px;
+            }
+        }
+    </style>
+</head>
+<body>
+    <div class="register-container">
+        <div class="register-header">
+            <i class="fas fa-user-plus"></i>
+            <h2>Crear Cuenta</h2>
+            <p>Únete al sistema de gestión de prácticas</p>
+        </div>
+
+        {% if error %}
+            <div class="alert alert-dismissible fade show" role="alert">
+                <i class="fas fa-exclamation-circle"></i> {{ error }}
+                <button type="button" class="btn-close" data-bs-dismiss="alert" aria-label="Close"></button>
+            </div>
+        {% endif %}
+
+        <form method="POST" action="{% url 'usuarios:register' %}">
+            {% csrf_token %}
+
+            <div class="form-row">
+                <div class="form-group">
+                    <label for="first_name" class="form-label">
+                        <i class="fas fa-user"></i> Nombre
+                    </label>
+                    <input type="text" class="form-control" id="first_name" name="first_name" placeholder="Tu nombre" required>
+                </div>
+                <div class="form-group">
+                    <label for="last_name" class="form-label">
+                        <i class="fas fa-user"></i> Apellido
+                    </label>
+                    <input type="text" class="form-control" id="last_name" name="last_name" placeholder="Tu apellido" required>
+                </div>
+            </div>
+
+            <div class="form-group">
+                <label for="username" class="form-label">
+                    <i class="fas fa-at"></i> Usuario
+                </label>
+                <input type="text" class="form-control" id="username" name="username" placeholder="Tu usuario único" required>
+                <small class="form-text">Entre 3 y 15 caracteres, sin espacios</small>
+            </div>
+
+            <div class="form-group">
+                <label for="email" class="form-label">
+                    <i class="fas fa-envelope"></i> Correo Electrónico
+                </label>
+                <input type="email" class="form-control" id="email" name="email" placeholder="tu@email.com" required>
+            </div>
+
+            <div class="form-row">
+                <div class="form-group">
+                    <label for="password" class="form-label">
+                        <i class="fas fa-lock"></i> Contraseña
+                    </label>
+                    <input type="password" class="form-control" id="password" name="password" placeholder="Tu contraseña" required>
+                </div>
+                <div class="form-group">
+                    <label for="password_confirm" class="form-label">
+                        <i class="fas fa-lock"></i> Confirmar
+                    </label>
+                    <input type="password" class="form-control" id="password_confirm" name="password_confirm" placeholder="Confirma" required>
+                </div>
+            </div>
+
+            <div class="form-group">
+                <label for="rol" class="form-label">
+                    <i class="fas fa-briefcase"></i> Tipo de Cuenta
+                </label>
+                <select class="form-control" id="rol" name="rol" required>
+                    <option value="">Selecciona tu rol</option>
+                    <option value="ESTUDIANTE">Estudiante</option>
+                    <option value="DOCENTE">Docente Asesor</option>
+                    <option value="INSTRUCTOR">Instructor Empresarial</option>
+                </select>
+            </div>
+
+            <button type="submit" class="btn-register">
+                <i class="fas fa-check"></i> Crear Cuenta
+            </button>
+
+            <a href="{% url 'login' %}" class="btn-back">
+                <i class="fas fa-arrow-left"></i> Volver al Inicio de Sesión
+            </a>
+        </form>
+    </div>
+
+    <!-- Bootstrap JS -->
+    <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/js/bootstrap.bundle.min.js"></script>
+</body>
+</html>
+

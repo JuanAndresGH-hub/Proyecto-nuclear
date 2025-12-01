@@ -1,0 +1,193 @@
+{% extends 'base.html' %}
+{% load static %}
+
+{% block title %}{% if empresa %}Editar Empresa{% else %}Nueva Empresa{% endif %} - Sistema de Gestión de Prácticas{% endblock %}
+
+{% block topbar_title %}{% if empresa %}Editar Empresa{% else %}Nueva Empresa{% endif %}{% endblock %}
+
+{% block content %}
+<div class="page-header">
+    <h1>
+        <i class="fas fa-building"></i>
+        {% if empresa %}Editar Empresa{% else %}Nueva Empresa{% endif %}
+    </h1>
+    <p>{% if empresa %}Actualiza la información de la empresa{% else %}Registra una nueva empresa en el sistema{% endif %}</p>
+</div>
+
+<div class="card">
+    <div class="card-body">
+        <form method="POST" id="empresaForm">
+            {% csrf_token %}
+
+            <div class="row">
+                <!-- Información Básica -->
+                <div class="col-md-6">
+                    <h5 class="mb-3"><i class="fas fa-info-circle"></i> Información Básica</h5>
+
+                    <div class="mb-3">
+                        <label for="nombre" class="form-label">Nombre de la Empresa <span class="text-danger">*</span></label>
+                        <input type="text" class="form-control" id="nombre" name="nombre"
+                               value="{{ empresa.nombre|default:'' }}" required>
+                    </div>
+
+                    <div class="mb-3">
+                        <label for="nit" class="form-label">NIT</label>
+                        <input type="text" class="form-control" id="nit" name="nit"
+                               value="{{ empresa.nit|default:'' }}" placeholder="Ej: 900123456-7">
+                    </div>
+
+                    <div class="mb-3">
+                        <label for="contacto" class="form-label">Persona de Contacto</label>
+                        <input type="text" class="form-control" id="contacto" name="contacto"
+                               value="{{ empresa.contacto|default:'' }}" placeholder="Nombre completo">
+                    </div>
+
+                    <div class="mb-3">
+                        <label for="ciudad" class="form-label">Ciudad <span class="text-danger">*</span></label>
+                        <input type="text" class="form-control" id="ciudad" name="ciudad"
+                               value="{{ empresa.ciudad|default:'' }}" required>
+                    </div>
+                </div>
+
+                <!-- Información de Contacto -->
+                <div class="col-md-6">
+                    <h5 class="mb-3"><i class="fas fa-phone"></i> Información de Contacto</h5>
+
+                    <div class="mb-3">
+                        <label for="telefono" class="form-label">Teléfono</label>
+                        <input type="tel" class="form-control" id="telefono" name="telefono"
+                               value="{{ empresa.telefono|default:'' }}" placeholder="Ej: 3101234567">
+                    </div>
+
+                    <div class="mb-3">
+                        <label for="correo" class="form-label">Correo Electrónico</label>
+                        <input type="email" class="form-control" id="correo" name="correo"
+                               value="{{ empresa.correo|default:'' }}" placeholder="contacto@empresa.com">
+                    </div>
+
+                    <div class="mb-3">
+                        <label for="direccion" class="form-label">Dirección</label>
+                        <textarea class="form-control" id="direccion" name="direccion"
+                                  rows="2" placeholder="Dirección completa">{{ empresa.direccion|default:'' }}</textarea>
+                    </div>
+
+                    <div class="mb-3">
+                        <div class="form-check form-switch">
+                            <input class="form-check-input" type="checkbox" id="activa" name="activa"
+                                   {% if not empresa or empresa.activa %}checked{% endif %}>
+                            <label class="form-check-label" for="activa">
+                                Empresa Activa
+                            </label>
+                        </div>
+                        <small class="text-muted">Las empresas inactivas no aparecerán en listados públicos</small>
+                    </div>
+                </div>
+            </div>
+
+            <!-- Descripción -->
+            <div class="row mt-3">
+                <div class="col-12">
+                    <h5 class="mb-3"><i class="fas fa-file-alt"></i> Descripción</h5>
+                    <div class="mb-3">
+                        <label for="descripcion" class="form-label">Descripción de la Empresa</label>
+                        <textarea class="form-control" id="descripcion" name="descripcion"
+                                  rows="4" placeholder="Describe la empresa, su actividad económica, valores, etc.">{{ empresa.descripcion|default:'' }}</textarea>
+                    </div>
+                </div>
+            </div>
+
+            <hr>
+
+            <!-- Botones -->
+            <div class="d-flex justify-content-between">
+                <a href="{% url 'empresas:empresas_list' %}" class="btn btn-secondary">
+                    <i class="fas fa-times"></i> Cancelar
+                </a>
+                <button type="submit" class="btn btn-dark">
+                    <i class="fas fa-save"></i>
+                    {% if empresa %}Guardar Cambios{% else %}Crear Empresa{% endif %}
+                </button>
+            </div>
+        </form>
+    </div>
+</div>
+
+<style>
+    .page-header {
+        margin-bottom: 30px;
+    }
+
+    .page-header h1 {
+        font-size: 2rem;
+        margin-bottom: 10px;
+    }
+
+    .page-header p {
+        color: #6c757d;
+        margin: 0;
+    }
+
+    .card {
+        border: none;
+        box-shadow: 0 2px 4px rgba(0,0,0,0.1);
+    }
+
+    .form-label {
+        font-weight: 600;
+        margin-bottom: 8px;
+    }
+
+    .form-control:focus {
+        border-color: #000;
+        box-shadow: 0 0 0 0.2rem rgba(0,0,0,0.1);
+    }
+
+    h5 i {
+        color: #198754;
+        margin-right: 8px;
+    }
+
+    .text-danger {
+        color: #dc3545 !important;
+    }
+
+    .btn-dark {
+        background-color: #000;
+        border-color: #000;
+    }
+
+    .btn-dark:hover {
+        background-color: #fff;
+        color: #000;
+        border-color: #000;
+        box-shadow: 0 2px 8px rgba(0,0,0,0.15);
+    }
+
+    .btn-secondary {
+        background-color: #6c757d;
+        border-color: #6c757d;
+    }
+
+    .btn-secondary:hover {
+        background-color: #fff;
+        color: #6c757d;
+        border-color: #6c757d;
+        box-shadow: 0 2px 8px rgba(0,0,0,0.15);
+    }
+</style>
+
+<script>
+document.getElementById('empresaForm').addEventListener('submit', function(e) {
+    const nombre = document.getElementById('nombre').value.trim();
+    const ciudad = document.getElementById('ciudad').value.trim();
+
+    if (!nombre || !ciudad) {
+        e.preventDefault();
+        alert('Por favor completa los campos obligatorios (Nombre y Ciudad)');
+        return false;
+    }
+});
+</script>
+
+{% endblock %}
+

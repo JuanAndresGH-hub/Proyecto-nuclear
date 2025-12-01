@@ -1,0 +1,361 @@
+{% extends 'base.html' %}
+{% load static %}
+
+{% block title %}Prácticas - Sistema de Gestión de Prácticas{% endblock %}
+
+{% block topbar_title %}
+    {% if user.rol == 'DOCENTE' %}
+        Estudiantes Asignados
+    {% elif user.rol == 'INSTRUCTOR' %}
+        Mis Practicantes
+    {% elif user.rol == 'COORDINADOR' %}
+        Gestionar Prácticas
+    {% else %}
+        Mis Prácticas
+    {% endif %}
+{% endblock %}
+
+{% block extra_css %}
+<style>
+.practica-card {
+    transition: all 0.3s ease;
+    height: 100%;
+}
+.practica-card:hover {
+    transform: translateY(-5px);
+    box-shadow: 0 8px 16px rgba(0,0,0,0.1);
+}
+.progress-ring {
+    width: 60px;
+    height: 60px;
+    border-radius: 50%;
+    background: conic-gradient(#198754 var(--progress), #e9ecef var(--progress));
+    display: flex;
+    align-items: center;
+    justify-content: center;
+}
+.progress-inner {
+    width: 50px;
+    height: 50px;
+    border-radius: 50%;
+    background: white;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    font-weight: 700;
+    font-size: 0.9rem;
+}
+</style>
+{% endblock %}
+
+{% block content %}
+<div class="page-header">
+    <h1>
+        <i class="fas fa-book"></i>
+        {% if user.rol == 'DOCENTE' %}
+            Estudiantes Asignados
+        {% elif user.rol == 'INSTRUCTOR' %}
+            Mis Practicantes
+        {% elif user.rol == 'COORDINADOR' %}
+            Gestionar Prácticas
+        {% else %}
+            Mis Prácticas
+        {% endif %}
+    </h1>
+    <p>
+        {% if user.rol == 'DOCENTE' %}
+            Gestiona y da seguimiento a tus estudiantes asignados en prácticas
+        {% elif user.rol == 'INSTRUCTOR' %}
+            Gestiona, supervisa y evalúa el desempeño de tus practicantes
+        {% elif user.rol == 'COORDINADOR' %}
+            Administra todas las prácticas del programa académico
+        {% else %}
+            Visualiza el estado y progreso de tus prácticas profesionales
+        {% endif %}
+    </p>
+</div>
+
+<!-- Estadísticas Rápidas -->
+{% if user.rol == 'COORDINADOR' or user.rol == 'DOCENTE' or user.rol == 'INSTRUCTOR' %}
+<div class="row mb-4">
+    <div class="col-md-3">
+        <div class="card" style="border-top: 3px solid #0dcaf0;">
+            <div class="card-body text-center">
+                <h2 style="font-size: 2rem; margin-bottom: 5px; color: #0dcaf0;">{{ practicas.count }}</h2>
+                <small style="color: #6c757d; font-weight: 500;">Total Prácticas</small>
+            </div>
+        </div>
+    </div>
+    <div class="col-md-3">
+        <div class="card" style="border-top: 3px solid #198754;">
+            <div class="card-body text-center">
+                <h2 style="font-size: 2rem; margin-bottom: 5px; color: #198754;">
+                    {{ practicas|length }}
+                </h2>
+                <small style="color: #6c757d; font-weight: 500;">En Curso</small>
+            </div>
+        </div>
+    </div>
+    <div class="col-md-3">
+        <div class="card" style="border-top: 3px solid #ffc107;">
+            <div class="card-body text-center">
+                <h2 style="font-size: 2rem; margin-bottom: 5px; color: #ffc107;">0</h2>
+                <small style="color: #6c757d; font-weight: 500;">Por Iniciar</small>
+            </div>
+        </div>
+    </div>
+    <div class="col-md-3">
+        <div class="card" style="border-top: 3px solid #6f42c1;">
+            <div class="card-body text-center">
+                <h2 style="font-size: 2rem; margin-bottom: 5px; color: #6f42c1;">0</h2>
+                <small style="color: #6c757d; font-weight: 500;">Finalizadas</small>
+            </div>
+        </div>
+    </div>
+</div>
+{% endif %}
+
+<!-- Filtros de Búsqueda -->
+{% if user.rol == 'COORDINADOR' or user.rol == 'DOCENTE' %}
+<div class="card mb-4">
+    <div class="card-body">
+        <form method="GET" class="row g-3">
+            <div class="col-md-4">
+                <input type="text" name="search" class="form-control" placeholder="Buscar estudiante..." value="{{ request.GET.search }}">
+            </div>
+            <div class="col-md-3">
+                <select name="estado" class="form-select">
+                    <option value="">Todos los estados</option>
+                    <option value="EN_CURSO">En Curso</option>
+                    <option value="FINALIZADA">Finalizada</option>
+                    <option value="NO_INICIADA">No Iniciada</option>
+                    <option value="REPROBADA">Reprobada</option>
+                </select>
+            </div>
+            <div class="col-md-3">
+                <select name="numero" class="form-select">
+                    <option value="">Todas las prácticas</option>
+                    <option value="1">Práctica 1</option>
+                    <option value="2">Práctica 2</option>
+                    <option value="3">Práctica 3</option>
+                    <option value="4">Práctica 4</option>
+                    <option value="5">Práctica 5</option>
+                </select>
+            </div>
+            <div class="col-md-2">
+                <button type="submit" class="btn btn-dark w-100">
+                    <i class="fas fa-search"></i> Buscar
+                </button>
+            </div>
+        </form>
+    </div>
+</div>
+{% endif %}
+
+{% if practicas %}
+    <!-- Vista de Tarjetas -->
+    <div class="row">
+        {% for practica in practicas %}
+        <div class="col-md-6 col-lg-4 mb-4">
+            <div class="card practica-card">
+                <div class="card-header" style="background: linear-gradient(135deg, #667eea 0%, #764ba2 100%); color: white;">
+                    <div class="d-flex justify-content-between align-items-center">
+                        <h6 class="mb-0" style="font-weight: 600;">
+                            <i class="fas fa-book"></i>
+                            {% if user.rol == 'ESTUDIANTE' %}
+                                Práctica {{ practica.numero }} de 5
+                            {% else %}
+                                Práctica #{{ practica.numero }}
+                            {% endif %}
+                        </h6>
+                        {% if practica.estado == 'EN_CURSO' %}
+                            <span class="badge" style="background-color: rgba(255,255,255,0.3); color: white; font-size: 0.8rem;">
+                                <i class="fas fa-circle" style="font-size: 0.5rem;"></i> En Curso
+                            </span>
+                        {% elif practica.estado == 'FINALIZADA' %}
+                            <span class="badge" style="background-color: rgba(255,255,255,0.3); color: white; font-size: 0.8rem;">
+                                <i class="fas fa-check-circle"></i> Finalizada
+                            </span>
+                        {% elif practica.estado == 'NO_INICIADA' %}
+                            <span class="badge" style="background-color: rgba(255,255,255,0.3); color: white; font-size: 0.8rem;">
+                                <i class="fas fa-clock"></i> No Iniciada
+                            </span>
+                        {% elif practica.estado == 'REPROBADA' %}
+                            <span class="badge" style="background-color: rgba(220,53,69,0.8); color: white; font-size: 0.8rem;">
+                                <i class="fas fa-times-circle"></i> Reprobada
+                            </span>
+                        {% endif %}
+                    </div>
+                </div>
+                <div class="card-body">
+                    {% if user.rol != 'ESTUDIANTE' %}
+                        <div class="mb-3 pb-3" style="border-bottom: 1px solid #e9ecef;">
+                            <div class="d-flex align-items-center">
+                                <div style="width: 40px; height: 40px; border-radius: 50%; background: linear-gradient(135deg, #667eea 0%, #764ba2 100%); display: flex; align-items: center; justify-content: center; color: white; font-weight: 700; margin-right: 10px;">
+                                    {{ practica.estudiante.usuario.get_full_name|slice:":1" }}
+                                </div>
+                                <div style="flex: 1;">
+                                    <a href="{% url 'usuarios:profile' %}" style="color: #212529; text-decoration: none; font-weight: 600; font-size: 0.95rem;">
+                                        {{ practica.estudiante.usuario.get_full_name }}
+                                    </a>
+                                    <br>
+                                    <small style="color: #6c757d;">{{ practica.estudiante.programa_academico|truncatewords:3 }}</small>
+                                </div>
+                            </div>
+                        </div>
+                    {% endif %}
+
+                    <div class="row mb-3">
+                        <div class="col-12 mb-2">
+                            <small style="color: #6c757d; display: block; font-weight: 500;">
+                                <i class="fas fa-building" style="color: #198754;"></i> Empresa
+                            </small>
+                            <p style="margin: 0; font-weight: 600; font-size: 0.95rem;">
+                                {% if practica.empresa %}
+                                    {{ practica.empresa.nombre }}
+                                {% else %}
+                                    <span style="color: #dc3545; font-weight: 500;">No asignada</span>
+                                {% endif %}
+                            </p>
+                        </div>
+                    </div>
+
+                    <div class="row mb-3">
+                        <div class="col-12 mb-2">
+                            <small style="color: #6c757d; display: block; font-weight: 500;">
+                                <i class="fas fa-calendar" style="color: #0dcaf0;"></i> Periodo
+                            </small>
+                            <p style="margin: 0; font-size: 0.85rem; color: #495057;">
+                                {% if practica.fecha_inicio and practica.fecha_fin %}
+                                    <strong>Inicio:</strong> {{ practica.fecha_inicio|date:"d M, Y" }}<br>
+                                    <strong>Fin:</strong> {{ practica.fecha_fin|date:"d M, Y" }}
+                                {% else %}
+                                    <span style="color: #ffc107; font-weight: 500;">Por programar</span>
+                                {% endif %}
+                            </p>
+                        </div>
+                    </div>
+
+                    <div class="row mb-3">
+                        <div class="col-6">
+                            <small style="color: #6c757d; display: block; font-weight: 500;">
+                                <i class="fas fa-chalkboard-teacher" style="color: #20c997;"></i> Docente
+                            </small>
+                            <p style="margin: 0; font-size: 0.85rem;">
+                                {% if practica.docente_asesor %}
+                                    {{ practica.docente_asesor.usuario.get_full_name|truncatewords:2 }}
+                                {% else %}
+                                    <span style="color: #6c757d;">No asignado</span>
+                                {% endif %}
+                            </p>
+                        </div>
+                        <div class="col-6">
+                            <small style="color: #6c757d; display: block; font-weight: 500;">
+                                <i class="fas fa-user-tie" style="color: #fd7e14;"></i> Instructor
+                            </small>
+                            <p style="margin: 0; font-size: 0.85rem;">
+                                {% if practica.instructor %}
+                                    {{ practica.instructor.usuario.get_full_name|truncatewords:2 }}
+                                {% else %}
+                                    <span style="color: #6c757d;">No asignado</span>
+                                {% endif %}
+                            </p>
+                        </div>
+                    </div>
+
+                    {% if practica.promedio_final %}
+                        <div class="mb-3 p-2" style="background-color: #f8f9fa; border-radius: 8px;">
+                            <div class="d-flex justify-content-between align-items-center">
+                                <div>
+                                    <small style="color: #6c757d; display: block; font-weight: 500;">
+                                        <i class="fas fa-star" style="color: #ffc107;"></i> Calificación Final
+                                    </small>
+                                    <h4 style="margin: 0; color: {% if practica.promedio_final >= 3.5 %}#198754{% else %}#dc3545{% endif %};">
+                                        {{ practica.promedio_final|floatformat:2 }}
+                                    </h4>
+                                </div>
+                                <div class="progress-ring" style="--progress: {% widthratio practica.promedio_final 5 100 %}%;">
+                                    <div class="progress-inner" style="color: {% if practica.promedio_final >= 3.5 %}#198754{% else %}#dc3545{% endif %};">
+                                        {% widthratio practica.promedio_final 5 100 %}%
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+                    {% endif %}
+
+                    <div class="d-grid gap-2">
+                        <a href="{% url 'practicas:practica_detail' practica.pk %}" class="btn btn-dark btn-sm">
+                            <i class="fas fa-eye"></i> Ver Detalles Completos
+                        </a>
+                        {% if user.rol != 'ESTUDIANTE' %}
+                        <div class="btn-group" role="group">
+                            <a href="{% url 'practicas:encuentros_list' %}?practica={{ practica.pk }}" class="btn btn-outline-dark btn-sm">
+                                <i class="fas fa-calendar-check"></i> Encuentros
+                            </a>
+                            <a href="{% url 'practicas:evaluaciones_list' %}?practica={{ practica.pk }}" class="btn btn-outline-dark btn-sm">
+                                <i class="fas fa-star"></i> Evaluaciones
+                            </a>
+                        </div>
+                        {% endif %}
+                    </div>
+                </div>
+            </div>
+        </div>
+        {% endfor %}
+    </div>
+{% else %}
+    <div style="text-align: center; color: #6c757d; padding: 80px 20px;">
+        <i class="fas fa-book-open" style="font-size: 4rem; color: #667eea; opacity: 0.3; margin-bottom: 20px; display: block;"></i>
+        <h5 style="color: #212529; margin-bottom: 15px; font-weight: 600;">
+            {% if user.rol == 'DOCENTE' %}
+                No hay estudiantes asignados
+            {% elif user.rol == 'INSTRUCTOR' %}
+                No hay practicantes asignados
+            {% elif user.rol == 'COORDINADOR' %}
+                No hay prácticas registradas
+            {% else %}
+                No tienes prácticas registradas
+            {% endif %}
+        </h5>
+        <p style="margin-bottom: 25px; color: #6c757d;">
+            {% if user.rol == 'DOCENTE' %}
+                Cuando se te asignen estudiantes, aparecerán aquí.
+            {% elif user.rol == 'INSTRUCTOR' %}
+                Los practicantes que supervises aparecerán en esta sección.
+            {% elif user.rol == 'COORDINADOR' %}
+                Comienza creando prácticas para tus estudiantes.
+            {% else %}
+                Tus prácticas profesionales aparecerán aquí una vez asignadas.
+            {% endif %}
+        </p>
+        {% if user.rol == 'COORDINADOR' %}
+        <a href="/admin/practicas/practica/add/" class="btn btn-dark">
+            <i class="fas fa-plus"></i> Crear Primera Práctica
+        </a>
+        {% endif %}
+    </div>
+{% endif %}
+
+<div class="mt-4">
+    <a href="{% if user.rol == 'COORDINADOR' %}{% url 'dashboard_coordinador' %}{% elif user.rol == 'DOCENTE' %}{% url 'dashboard_docente' %}{% elif user.rol == 'INSTRUCTOR' %}{% url 'dashboard_instructor' %}{% else %}{% url 'dashboard_estudiante' %}{% endif %}" class="btn btn-dark">
+        <i class="fas fa-arrow-left"></i> Volver al Dashboard
+    </a>
+</div>
+
+{% endblock %}
+
+{% block extra_js %}
+<script>
+// Animaciones hover en tarjetas
+document.querySelectorAll('.practica-card').forEach(card => {
+    card.addEventListener('mouseenter', function() {
+        this.style.transform = 'translateY(-8px)';
+    });
+
+    card.addEventListener('mouseleave', function() {
+        this.style.transform = 'translateY(0)';
+    });
+});
+</script>
+{% endblock %}
+

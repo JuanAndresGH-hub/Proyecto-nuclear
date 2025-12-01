@@ -1,0 +1,160 @@
+{% extends 'base.html' %}
+{% load static %}
+
+{% block title %}Detalle del Encuentro - Sistema de Gestión de Prácticas{% endblock %}
+
+{% block topbar_title %}Detalle del Encuentro{% endblock %}
+
+{% block content %}
+<div class="page-header">
+    <h1><i class="fas fa-calendar-alt"></i> {{ encuentro.tema }}</h1>
+    <p>Encuentro registrado el {{ encuentro.fecha|date:"d/m/Y" }}</p>
+</div>
+
+<div class="row">
+    <div class="col-lg-8">
+        <div class="card mb-4">
+            <div class="card-header">
+                <h5 class="mb-0"><i class="fas fa-info-circle"></i> Información del Encuentro</h5>
+            </div>
+            <div class="card-body">
+                <div class="row mb-3">
+                    <div class="col-md-6">
+                        <small style="color: #6c757d; display: block; margin-bottom: 5px;">Fecha</small>
+                        <p style="margin: 0; font-weight: 500;">
+                            <i class="fas fa-calendar"></i> {{ encuentro.fecha|date:"d/m/Y" }}
+                        </p>
+                    </div>
+                    <div class="col-md-6">
+                        <small style="color: #6c757d; display: block; margin-bottom: 5px;">Horario</small>
+                        <p style="margin: 0; font-weight: 500;">
+                            <i class="fas fa-clock"></i>
+                            {% if encuentro.hora_inicio and encuentro.hora_fin %}
+                                {{ encuentro.hora_inicio|time:"H:i" }} - {{ encuentro.hora_fin|time:"H:i" }}
+                            {% else %}
+                                No especificado
+                            {% endif %}
+                        </p>
+                    </div>
+                </div>
+
+                <hr>
+
+                <div class="mb-3">
+                    <small style="color: #6c757d; display: block; margin-bottom: 5px;">Tema</small>
+                    <h5 style="margin: 0; color: #212529;">{{ encuentro.tema }}</h5>
+                </div>
+
+                <div class="mb-3">
+                    <small style="color: #6c757d; display: block; margin-bottom: 10px;">Descripción</small>
+                    <p style="margin: 0; color: #495057; line-height: 1.6; white-space: pre-wrap;">{{ encuentro.descripcion }}</p>
+                </div>
+
+                {% if encuentro.acuerdos %}
+                    <hr>
+                    <div class="mb-3">
+                        <small style="color: #6c757d; display: block; margin-bottom: 10px;">
+                            <i class="fas fa-handshake"></i> Acuerdos y Compromisos
+                        </small>
+                        <div style="background: #f8f9fa; padding: 15px; border-left: 3px solid #0dcaf0; border-radius: 4px;">
+                            <p style="margin: 0; color: #495057; line-height: 1.6; white-space: pre-wrap;">{{ encuentro.acuerdos }}</p>
+                        </div>
+                    </div>
+                {% endif %}
+            </div>
+        </div>
+    </div>
+
+    <div class="col-lg-4">
+        <div class="card mb-4">
+            <div class="card-header">
+                <h5 class="mb-0"><i class="fas fa-user-graduate"></i> Estudiante</h5>
+            </div>
+            <div class="card-body">
+                <h6 style="margin-bottom: 10px;">{{ encuentro.practica.estudiante.usuario.get_full_name }}</h6>
+                <p style="margin: 0; color: #6c757d; font-size: 0.9rem;">
+                    {{ encuentro.practica.estudiante.programa_academico }}
+                </p>
+                <p style="margin: 5px 0 0 0; color: #6c757d; font-size: 0.9rem;">
+                    <i class="fas fa-book"></i> Práctica {{ encuentro.practica.numero }} de 5
+                </p>
+            </div>
+        </div>
+
+        <div class="card mb-4">
+            <div class="card-header">
+                <h5 class="mb-0"><i class="fas fa-building"></i> Empresa</h5>
+            </div>
+            <div class="card-body">
+                {% if encuentro.practica.empresa %}
+                    <h6 style="margin-bottom: 10px;">{{ encuentro.practica.empresa.nombre }}</h6>
+                    <p style="margin: 0; color: #6c757d; font-size: 0.9rem;">
+                        <i class="fas fa-map-marker-alt"></i> {{ encuentro.practica.empresa.ciudad|default:"No especificada" }}
+                    </p>
+                {% else %}
+                    <p style="margin: 0; color: #6c757d;">No asignada</p>
+                {% endif %}
+            </div>
+        </div>
+
+        <div class="card mb-4">
+            <div class="card-header">
+                <h5 class="mb-0"><i class="fas fa-check-circle"></i> Asistencia</h5>
+            </div>
+            <div class="card-body">
+                <div class="mb-2">
+                    <small style="color: #6c757d; display: block;">Estudiante</small>
+                    {% if encuentro.asistencia_estudiante %}
+                        <span class="badge" style="background-color: #d1f0e3; color: #0f5130;">
+                            <i class="fas fa-check"></i> Asistió
+                        </span>
+                    {% else %}
+                        <span class="badge" style="background-color: #f8d7da; color: #842029;">
+                            <i class="fas fa-times"></i> No asistió
+                        </span>
+                    {% endif %}
+                </div>
+                <div>
+                    <small style="color: #6c757d; display: block;">Docente</small>
+                    {% if encuentro.asistencia_docente %}
+                        <span class="badge" style="background-color: #d1f0e3; color: #0f5130;">
+                            <i class="fas fa-check"></i> Asistió
+                        </span>
+                    {% else %}
+                        <span class="badge" style="background-color: #f8d7da; color: #842029;">
+                            <i class="fas fa-times"></i> No asistió
+                        </span>
+                    {% endif %}
+                </div>
+            </div>
+        </div>
+
+        <div class="card">
+            <div class="card-header">
+                <h5 class="mb-0"><i class="fas fa-user-tie"></i> Docente Asesor</h5>
+            </div>
+            <div class="card-body">
+                {% if encuentro.registrado_por_docente %}
+                    <h6 style="margin-bottom: 10px;">{{ encuentro.registrado_por_docente.usuario.get_full_name }}</h6>
+                    <p style="margin: 0; color: #6c757d; font-size: 0.9rem;">
+                        <i class="fas fa-envelope"></i> {{ encuentro.registrado_por_docente.usuario.email }}
+                    </p>
+                {% else %}
+                    <p style="margin: 0; color: #6c757d;">No registrado</p>
+                {% endif %}
+            </div>
+        </div>
+    </div>
+</div>
+
+<div class="d-flex gap-3 mt-4">
+    <a href="{% url 'practicas:encuentros_list' %}" class="btn btn-dark">
+        <i class="fas fa-arrow-left"></i> Volver a Encuentros
+    </a>
+    <a href="{% url 'practicas:practica_detail' encuentro.practica.pk %}" class="btn btn-dark">
+        <i class="fas fa-book"></i> Ver Práctica
+    </a>
+</div>
+
+{% endblock %}
+

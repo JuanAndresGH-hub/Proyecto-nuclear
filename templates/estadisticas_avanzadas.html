@@ -1,0 +1,308 @@
+{% extends 'base.html' %}
+{% load static %}
+
+{% block title %}Estadísticas Avanzadas - Sistema de Gestión de Prácticas{% endblock %}
+
+{% block topbar_title %}Estadísticas Avanzadas{% endblock %}
+
+{% block extra_css %}
+<style>
+.chart-container {
+    position: relative;
+    height: 400px;
+    margin-bottom: 30px;
+}
+.chart-card {
+    background: white;
+    border-radius: 8px;
+    padding: 20px;
+    box-shadow: 0 2px 4px rgba(0,0,0,0.1);
+    margin-bottom: 20px;
+}
+.chart-title {
+    font-size: 1.2rem;
+    font-weight: 600;
+    color: #212529;
+    margin-bottom: 20px;
+    padding-bottom: 10px;
+    border-bottom: 2px solid #198754;
+}
+</style>
+{% endblock %}
+
+{% block content %}
+<div class="page-header">
+    <h1><i class="fas fa-chart-line"></i> Estadísticas Avanzadas</h1>
+    <p>Análisis visual detallado del sistema de gestión de prácticas</p>
+</div>
+
+<div class="row">
+    <!-- Gráfico 1: Prácticas por Programa -->
+    <div class="col-lg-6 mb-4">
+        <div class="chart-card">
+            <h5 class="chart-title">
+                <i class="fas fa-graduation-cap"></i> Prácticas por Programa Académico
+            </h5>
+            <div class="chart-container">
+                <canvas id="practicasPorProgramaChart"></canvas>
+            </div>
+        </div>
+    </div>
+
+    <!-- Gráfico 2: Prácticas por Estado -->
+    <div class="col-lg-6 mb-4">
+        <div class="chart-card">
+            <h5 class="chart-title">
+                <i class="fas fa-tasks"></i> Distribución de Prácticas por Estado
+            </h5>
+            <div class="chart-container">
+                <canvas id="practicasPorEstadoChart"></canvas>
+            </div>
+        </div>
+    </div>
+
+    <!-- Gráfico 3: Estado de Hojas de Vida -->
+    <div class="col-lg-6 mb-4">
+        <div class="chart-card">
+            <h5 class="chart-title">
+                <i class="fas fa-file-alt"></i> Estado de Hojas de Vida
+            </h5>
+            <div class="chart-container">
+                <canvas id="hvEstadisticasChart"></canvas>
+            </div>
+        </div>
+    </div>
+
+    <!-- Gráfico 4: Top Empresas -->
+    <div class="col-lg-6 mb-4">
+        <div class="chart-card">
+            <h5 class="chart-title">
+                <i class="fas fa-building"></i> Top 5 Empresas con Más Postulaciones
+            </h5>
+            <div class="chart-container">
+                <canvas id="topEmpresasChart"></canvas>
+            </div>
+        </div>
+    </div>
+
+    <!-- Gráfico 5: Evolución de Prácticas -->
+    <div class="col-12 mb-4">
+        <div class="chart-card">
+            <h5 class="chart-title">
+                <i class="fas fa-calendar-alt"></i> Evolución de Prácticas (Últimos 6 Meses)
+            </h5>
+            <div class="chart-container">
+                <canvas id="evolucionPracticasChart"></canvas>
+            </div>
+        </div>
+    </div>
+</div>
+
+<div class="mt-4">
+    <a href="{% url 'usuarios:reportes' %}" class="btn btn-dark">
+        <i class="fas fa-arrow-left"></i> Volver a Reportes
+    </a>
+    <button onclick="window.print()" class="btn btn-secondary">
+        <i class="fas fa-print"></i> Imprimir
+    </button>
+</div>
+
+{% endblock %}
+
+{% block extra_js %}
+<!-- Chart.js -->
+<script src="https://cdn.jsdelivr.net/npm/chart.js@3.9.1/dist/chart.min.js"></script>
+
+<script>
+// Datos desde Django
+const practicasPorPrograma = JSON.parse('{{ practicas_por_programa|escapejs }}');
+const practicasPorEstado = JSON.parse('{{ practicas_por_estado|escapejs }}');
+const hvEstadisticas = JSON.parse('{{ hv_estadisticas|escapejs }}');
+const topEmpresas = JSON.parse('{{ top_empresas|escapejs }}');
+const practicasPorMes = JSON.parse('{{ practicas_por_mes|escapejs }}');
+
+// Colores
+const colors = {
+    primary: '#198754',
+    secondary: '#0dcaf0',
+    warning: '#ffc107',
+    danger: '#dc3545',
+    info: '#0d6efd',
+    purple: '#6f42c1',
+    teal: '#20c997',
+    orange: '#fd7e14',
+};
+
+// Gráfico 1: Prácticas por Programa
+const ctx1 = document.getElementById('practicasPorProgramaChart').getContext('2d');
+new Chart(ctx1, {
+    type: 'bar',
+    data: {
+        labels: practicasPorPrograma.map(p => p.estudiante__programa_academico || 'Sin programa'),
+        datasets: [{
+            label: 'Número de Prácticas',
+            data: practicasPorPrograma.map(p => p.total),
+            backgroundColor: colors.primary,
+            borderColor: colors.primary,
+            borderWidth: 1
+        }]
+    },
+    options: {
+        responsive: true,
+        maintainAspectRatio: false,
+        plugins: {
+            legend: {
+                display: false
+            }
+        },
+        scales: {
+            y: {
+                beginAtZero: true,
+                ticks: {
+                    stepSize: 1
+                }
+            }
+        }
+    }
+});
+
+// Gráfico 2: Prácticas por Estado
+const ctx2 = document.getElementById('practicasPorEstadoChart').getContext('2d');
+new Chart(ctx2, {
+    type: 'doughnut',
+    data: {
+        labels: ['En Curso', 'Finalizada', 'Cancelada'],
+        datasets: [{
+            data: [
+                practicasPorEstado.en_curso || 0,
+                practicasPorEstado.finalizada || 0,
+                practicasPorEstado.cancelada || 0
+            ],
+            backgroundColor: [
+                colors.primary,
+                colors.secondary,
+                colors.danger
+            ],
+            borderWidth: 2,
+            borderColor: '#fff'
+        }]
+    },
+    options: {
+        responsive: true,
+        maintainAspectRatio: false,
+        plugins: {
+            legend: {
+                position: 'bottom'
+            }
+        }
+    }
+});
+
+// Gráfico 3: Estado de Hojas de Vida
+const ctx3 = document.getElementById('hvEstadisticasChart').getContext('2d');
+new Chart(ctx3, {
+    type: 'pie',
+    data: {
+        labels: ['Pendiente', 'En Revisión', 'Aprobada', 'Rechazada'],
+        datasets: [{
+            data: [
+                hvEstadisticas.pendiente || 0,
+                hvEstadisticas.en_revision || 0,
+                hvEstadisticas.aprobada || 0,
+                hvEstadisticas.rechazada || 0
+            ],
+            backgroundColor: [
+                colors.warning,
+                colors.info,
+                colors.primary,
+                colors.danger
+            ],
+            borderWidth: 2,
+            borderColor: '#fff'
+        }]
+    },
+    options: {
+        responsive: true,
+        maintainAspectRatio: false,
+        plugins: {
+            legend: {
+                position: 'bottom'
+            }
+        }
+    }
+});
+
+// Gráfico 4: Top Empresas
+const ctx4 = document.getElementById('topEmpresasChart').getContext('2d');
+new Chart(ctx4, {
+    type: 'horizontalBar',
+    data: {
+        labels: topEmpresas.map(e => e.vacante__empresa__nombre || 'Sin empresa'),
+        datasets: [{
+            label: 'Postulaciones',
+            data: topEmpresas.map(e => e.total),
+            backgroundColor: colors.secondary,
+            borderColor: colors.secondary,
+            borderWidth: 1
+        }]
+    },
+    options: {
+        indexAxis: 'y',
+        responsive: true,
+        maintainAspectRatio: false,
+        plugins: {
+            legend: {
+                display: false
+            }
+        },
+        scales: {
+            x: {
+                beginAtZero: true,
+                ticks: {
+                    stepSize: 1
+                }
+            }
+        }
+    }
+});
+
+// Gráfico 5: Evolución de Prácticas
+const ctx5 = document.getElementById('evolucionPracticasChart').getContext('2d');
+new Chart(ctx5, {
+    type: 'line',
+    data: {
+        labels: practicasPorMes.map(p => {
+            const fecha = new Date(p.mes);
+            return fecha.toLocaleDateString('es-ES', { month: 'short', year: 'numeric' });
+        }),
+        datasets: [{
+            label: 'Prácticas Iniciadas',
+            data: practicasPorMes.map(p => p.total),
+            backgroundColor: 'rgba(25, 135, 84, 0.2)',
+            borderColor: colors.primary,
+            borderWidth: 3,
+            fill: true,
+            tension: 0.4
+        }]
+    },
+    options: {
+        responsive: true,
+        maintainAspectRatio: false,
+        plugins: {
+            legend: {
+                position: 'top'
+            }
+        },
+        scales: {
+            y: {
+                beginAtZero: true,
+                ticks: {
+                    stepSize: 1
+                }
+            }
+        }
+    }
+});
+</script>
+{% endblock %}
+

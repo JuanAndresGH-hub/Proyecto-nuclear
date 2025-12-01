@@ -1,0 +1,146 @@
+{% extends 'base.html' %}
+
+{% block title %}Vacantes Disponibles - Sistema de Gestión de Prácticas{% endblock %}
+
+{% block topbar_title %}Vacantes Disponibles{% endblock %}
+
+{% block content %}
+<div class="page-header">
+    <h1><i class="fas fa-briefcase"></i> Vacantes Disponibles</h1>
+    <p>Postúlate a las ofertas de práctica empresarial</p>
+</div>
+
+{% if user.rol == 'ESTUDIANTE' %}
+    {% if user.perfil_estudiante.estado_hv != 'APROBADA' %}
+        <div class="alert alert-warning alert-dismissible fade show" role="alert" style="border-left-color: #ffc107;">
+            <strong><i class="fas fa-exclamation-triangle"></i> Atención:</strong>
+            Tu hoja de vida no ha sido aprobada aún. Solo puedes ver las vacantes pero no postularte hasta que sea validada.
+            <button type="button" class="btn-close" data-bs-dismiss="alert" aria-label="Close"></button>
+        </div>
+    {% else %}
+        <div class="alert alert-info alert-dismissible fade show" role="alert" style="border-left-color: #0dcaf0;">
+            <i class="fas fa-info-circle"></i> Ya tienes una postulación activa. Solo puedes tener una postulación por cohorte.
+            <button type="button" class="btn-close" data-bs-dismiss="alert" aria-label="Close"></button>
+        </div>
+    {% endif %}
+{% endif %}
+
+<div class="card mb-4">
+    <div class="card-header">
+        <h5 class="mb-0"><i class="fas fa-filter"></i> Filtros de Búsqueda</h5>
+    </div>
+    <div class="card-body">
+        <form method="GET" class="row g-3">
+            <div class="col-md-4">
+                <label class="form-label"><i class="fas fa-building"></i> Empresa</label>
+                <select name="empresa" class="form-control">
+                    <option value="">Todas las empresas</option>
+                    {% for vacante in vacantes %}
+                        <option value="{{ vacante.empresa.id }}">{{ vacante.empresa.nombre }}</option>
+                    {% endfor %}
+                </select>
+            </div>
+            <div class="col-md-4">
+                <label class="form-label"><i class="fas fa-map-marker-alt"></i> Modalidad</label>
+                <select name="modalidad" class="form-control">
+                    <option value="">Todas las modalidades</option>
+                    <option value="PRESENCIAL">Presencial</option>
+                    <option value="HIBRIDO">Híbrido</option>
+                    <option value="REMOTO">Remoto</option>
+                </select>
+            </div>
+            <div class="col-md-4">
+                <label class="form-label">&nbsp;</label>
+                <button type="submit" class="btn btn-primary w-100">
+                    <i class="fas fa-search"></i> Filtrar
+                </button>
+            </div>
+        </form>
+    </div>
+</div>
+
+{% if vacantes %}
+    <div class="row">
+        {% for vacante in vacantes %}
+            <div class="col-lg-6 mb-4">
+                <div class="card" style="height: 100%; display: flex; flex-direction: column;">
+                    <div class="card-body" style="flex: 1;">
+                        <div class="d-flex justify-content-between align-items-start mb-3">
+                            <div>
+                                <h5 class="card-title" style="margin-bottom: 5px;">{{ vacante.titulo }}</h5>
+                                <div style="color: #6c757d; font-size: 0.95rem; display: flex; align-items: center; gap: 8px;">
+                                    <i class="fas fa-building"></i>
+                                    <span>{{ vacante.empresa.nombre }}</span>
+                                </div>
+                            </div>
+                            <span class="badge" style="background-color: #d1f0e3; color: #0f5130; padding: 6px 12px; font-size: 0.8rem;">
+                                {% if vacante.estado == 'ACTIVA' %}
+                                    <i class="fas fa-check-circle"></i> Activa
+                                {% else %}
+                                    Cerrada
+                                {% endif %}
+                            </span>
+                        </div>
+
+                        <div style="display: flex; gap: 15px; margin: 15px 0; flex-wrap: wrap;">
+                            <div style="display: flex; align-items: center; gap: 6px; color: #6c757d; font-size: 0.9rem;">
+                                <i class="fas fa-map-marker-alt" style="color: #212529;"></i>
+                                {% if vacante.modalidad == 'PRESENCIAL' %}
+                                    Presencial
+                                {% elif vacante.modalidad == 'HIBRIDO' %}
+                                    Híbrido
+                                {% else %}
+                                    Remoto
+                                {% endif %}
+                            </div>
+                            <div style="display: flex; align-items: center; gap: 6px; color: #6c757d; font-size: 0.9rem;">
+                                <i class="fas fa-calendar-alt" style="color: #212529;"></i>
+                                {{ vacante.duracion_meses }} meses
+                            </div>
+                            <div style="display: flex; align-items: center; gap: 6px; color: #6c757d; font-size: 0.9rem;">
+                                <i class="fas fa-users" style="color: #212529;"></i>
+                                {{ vacante.cantidad_plazas }} plaza(s)
+                            </div>
+                        </div>
+
+                        {% if vacante.salario_rango %}
+                            <div style="margin: 12px 0; padding: 12px; background: #f8f9fa; border-left: 3px solid #212529; border-radius: 4px;">
+                                <i class="fas fa-dollar-sign" style="color: #212529;"></i>
+                                <strong style="color: #212529;">{{ vacante.salario_rango }}/mes</strong>
+                            </div>
+                        {% endif %}
+
+                        <p style="margin-top: 15px; color: #6c757d; font-size: 0.9rem; line-height: 1.6;">{{ vacante.descripcion|truncatewords:25 }}</p>
+                    </div>
+
+                    <div class="card-body" style="padding-top: 0; border-top: 1px solid #e9ecef;">
+                        <div class="d-flex gap-2" style="margin-top: 15px;">
+                            <a href="{% url 'empresas:vacante_detail' vacante.pk %}" class="btn btn-sm btn-dark flex-grow-1">
+                                <i class="fas fa-eye"></i> Ver Detalles
+                            </a>
+                            {% if user.rol == 'ESTUDIANTE' and user.perfil_estudiante.estado_hv == 'APROBADA' %}
+                                <a href="{% url 'empresas:postulacion_create' %}" class="btn btn-sm btn-primary flex-grow-1">
+                                    <i class="fas fa-paper-plane"></i> Postularme
+                                </a>
+                            {% endif %}
+                        </div>
+                    </div>
+                </div>
+            </div>
+        {% endfor %}
+    </div>
+{% else %}
+    <div class="card">
+        <div class="card-body" style="text-align: center; padding: 60px 20px;">
+            <i class="fas fa-inbox" style="font-size: 3rem; color: #dee2e6; margin-bottom: 20px; display: block; opacity: 0.7;"></i>
+            <h5 style="color: #212529; margin-bottom: 10px;">No hay vacantes disponibles</h5>
+            <p style="color: #6c757d; margin-bottom: 20px;">En este momento no hay vacantes que coincidan con los criterios de búsqueda.</p>
+            <a href="{% url 'empresas:vacantes_list' %}" class="btn btn-primary">
+                <i class="fas fa-refresh"></i> Volver a Ver Todas
+            </a>
+        </div>
+    </div>
+{% endif %}
+
+{% endblock %}
+

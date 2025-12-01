@@ -1,0 +1,261 @@
+{% extends 'base.html' %}
+{% load static %}
+
+{% block title %}Dashboard Coordinador - Sistema de Gestión de Prácticas{% endblock %}
+
+{% block topbar_title %}Dashboard Coordinador{% endblock %}
+
+{% block content %}
+<div class="page-header">
+    <h1><i class="fas fa-chart-line"></i> Panel de Control - Coordinador</h1>
+    <p>Vista general del sistema de gestión de prácticas</p>
+</div>
+
+<!-- Estadísticas Principales -->
+<div class="row mb-4">
+    <!-- Estudiantes -->
+    <div class="col-lg-3 col-md-6 mb-3">
+        <div class="card" style="border-top: 3px solid #0dcaf0;">
+            <div class="card-body">
+                <div class="d-flex justify-content-between align-items-center">
+                    <div>
+                        <small style="color: #6c757d; display: block; margin-bottom: 5px;">Total Estudiantes</small>
+                        <h2 style="margin: 0; color: #212529;">{{ total_estudiantes }}</h2>
+                    </div>
+                    <div style="font-size: 2.5rem; color: #0dcaf0; opacity: 0.8;">
+                        <i class="fas fa-user-graduate"></i>
+                    </div>
+                </div>
+                <hr style="margin: 10px 0;">
+                <small style="color: #6c757d;">
+                    <i class="fas fa-check" style="color: #198754;"></i> {{ estudiantes_con_hv_aprobada }} con HV aprobada
+                </small>
+            </div>
+        </div>
+    </div>
+
+    <!-- Prácticas Activas -->
+    <div class="col-lg-3 col-md-6 mb-3">
+        <div class="card" style="border-top: 3px solid #198754;">
+            <div class="card-body">
+                <div class="d-flex justify-content-between align-items-center">
+                    <div>
+                        <small style="color: #6c757d; display: block; margin-bottom: 5px;">Prácticas Activas</small>
+                        <h2 style="margin: 0; color: #212529;">{{ practicas_activas }}</h2>
+                    </div>
+                    <div style="font-size: 2.5rem; color: #198754; opacity: 0.8;">
+                        <i class="fas fa-briefcase"></i>
+                    </div>
+                </div>
+                <hr style="margin: 10px 0;">
+                <small style="color: #6c757d;">
+                    De {{ total_practicas }} totales
+                </small>
+            </div>
+        </div>
+    </div>
+
+    <!-- Vacantes Activas -->
+    <div class="col-lg-3 col-md-6 mb-3">
+        <div class="card" style="border-top: 3px solid #ffc107;">
+            <div class="card-body">
+                <div class="d-flex justify-content-between align-items-center">
+                    <div>
+                        <small style="color: #6c757d; display: block; margin-bottom: 5px;">Vacantes Activas</small>
+                        <h2 style="margin: 0; color: #212529;">{{ vacantes_activas }}</h2>
+                    </div>
+                    <div style="font-size: 2.5rem; color: #ffc107; opacity: 0.8;">
+                        <i class="fas fa-file-alt"></i>
+                    </div>
+                </div>
+                <hr style="margin: 10px 0;">
+                <small style="color: #6c757d;">
+                    {{ total_vacantes }} publicadas en total
+                </small>
+            </div>
+        </div>
+    </div>
+
+    <!-- Hojas de Vida Pendientes -->
+    <div class="col-lg-3 col-md-6 mb-3">
+        <div class="card" style="border-top: 3px solid #dc3545;">
+            <div class="card-body">
+                <div class="d-flex justify-content-between align-items-center">
+                    <div>
+                        <small style="color: #6c757d; display: block; margin-bottom: 5px;">HV Pendientes</small>
+                        <h2 style="margin: 0; color: #212529;">{{ hvs_pendientes }}</h2>
+                    </div>
+                    <div style="font-size: 2.5rem; color: #dc3545; opacity: 0.8;">
+                        <i class="fas fa-exclamation-circle"></i>
+                    </div>
+                </div>
+                <hr style="margin: 10px 0;">
+                <a href="{% url 'usuarios:revisar_hojas_vida' %}" style="color: #dc3545; text-decoration: none; font-size: 0.9rem;">
+                    <i class="fas fa-arrow-right"></i> Revisar ahora
+                </a>
+            </div>
+        </div>
+    </div>
+</div>
+
+<!-- Accesos Rápidos -->
+<div class="row mb-4">
+    <div class="col-12">
+        <h5 style="margin-bottom: 15px; color: #212529;">
+            <i class="fas fa-bolt"></i> Accesos Rápidos
+        </h5>
+    </div>
+
+    <div class="col-lg-3 col-md-6 mb-3">
+        <a href="{% url 'usuarios:estudiantes_list' %}" class="card" style="text-decoration: none; color: inherit; transition: transform 0.2s;" onmouseover="this.style.transform='translateY(-5px)'" onmouseout="this.style.transform='translateY(0)'">
+            <div class="card-body text-center">
+                <i class="fas fa-users" style="font-size: 3rem; color: #0dcaf0; opacity: 0.8; margin-bottom: 15px;"></i>
+                <h6 style="margin: 0; color: #212529;">Gestionar Estudiantes</h6>
+                <small style="color: #6c757d;">Ver y administrar estudiantes</small>
+            </div>
+        </a>
+    </div>
+
+    <div class="col-lg-3 col-md-6 mb-3">
+        <a href="{% url 'empresas:empresas_list' %}" class="card" style="text-decoration: none; color: inherit; transition: transform 0.2s;" onmouseover="this.style.transform='translateY(-5px)'" onmouseout="this.style.transform='translateY(0)'">
+            <div class="card-body text-center">
+                <i class="fas fa-building" style="font-size: 3rem; color: #198754; opacity: 0.8; margin-bottom: 15px;"></i>
+                <h6 style="margin: 0; color: #212529;">Gestionar Empresas</h6>
+                <small style="color: #6c757d;">Administrar empresas</small>
+            </div>
+        </a>
+    </div>
+
+    <div class="col-lg-3 col-md-6 mb-3">
+        <a href="{% url 'empresas:vacantes_list' %}" class="card" style="text-decoration: none; color: inherit; transition: transform 0.2s;" onmouseover="this.style.transform='translateY(-5px)'" onmouseout="this.style.transform='translateY(0)'">
+            <div class="card-body text-center">
+                <i class="fas fa-file-alt" style="font-size: 3rem; color: #ffc107; opacity: 0.8; margin-bottom: 15px;"></i>
+                <h6 style="margin: 0; color: #212529;">Ver Vacantes</h6>
+                <small style="color: #6c757d;">Gestionar oportunidades</small>
+            </div>
+        </a>
+    </div>
+
+    <div class="col-lg-3 col-md-6 mb-3">
+        <a href="{% url 'empresas:postulaciones_list' %}" class="card" style="text-decoration: none; color: inherit; transition: transform 0.2s;" onmouseover="this.style.transform='translateY(-5px)'" onmouseout="this.style.transform='translateY(0)'">
+            <div class="card-body text-center">
+                <i class="fas fa-paper-plane" style="font-size: 3rem; color: #6f42c1; opacity: 0.8; margin-bottom: 15px;"></i>
+                <h6 style="margin: 0; color: #212529;">Postulaciones</h6>
+                <small style="color: #6c757d;">Revisar postulaciones</small>
+            </div>
+        </a>
+    </div>
+
+    <div class="col-lg-3 col-md-6 mb-3">
+        <a href="{% url 'usuarios:revisar_hojas_vida' %}" class="card" style="text-decoration: none; color: inherit; transition: transform 0.2s;" onmouseover="this.style.transform='translateY(-5px)'" onmouseout="this.style.transform='translateY(0)'">
+            <div class="card-body text-center">
+                <i class="fas fa-clipboard-check" style="font-size: 3rem; color: #dc3545; opacity: 0.8; margin-bottom: 15px;"></i>
+                <h6 style="margin: 0; color: #212529;">Revisar Hojas de Vida</h6>
+                <small style="color: #6c757d;">{{ hvs_pendientes }} pendientes</small>
+            </div>
+        </a>
+    </div>
+
+    <div class="col-lg-3 col-md-6 mb-3">
+        <a href="{% url 'practicas:practicas_list' %}" class="card" style="text-decoration: none; color: inherit; transition: transform 0.2s;" onmouseover="this.style.transform='translateY(-5px)'" onmouseout="this.style.transform='translateY(0)'">
+            <div class="card-body text-center">
+                <i class="fas fa-briefcase" style="font-size: 3rem; color: #20c997; opacity: 0.8; margin-bottom: 15px;"></i>
+                <h6 style="margin: 0; color: #212529;">Gestionar Prácticas</h6>
+                <small style="color: #6c757d;">Administrar asignaciones</small>
+            </div>
+        </a>
+    </div>
+
+    <div class="col-lg-3 col-md-6 mb-3">
+        <a href="{% url 'usuarios:reportes' %}" class="card" style="text-decoration: none; color: inherit; transition: transform 0.2s;" onmouseover="this.style.transform='translateY(-5px)'" onmouseout="this.style.transform='translateY(0)'">
+            <div class="card-body text-center">
+                <i class="fas fa-chart-bar" style="font-size: 3rem; color: #fd7e14; opacity: 0.8; margin-bottom: 15px;"></i>
+                <h6 style="margin: 0; color: #212529;">Reportes</h6>
+                <small style="color: #6c757d;">Ver estadísticas</small>
+            </div>
+        </a>
+    </div>
+
+    <div class="col-lg-3 col-md-6 mb-3">
+        <a href="{% url 'encuestas:encuestas_list' %}" class="card" style="text-decoration: none; color: inherit; transition: transform 0.2s;" onmouseover="this.style.transform='translateY(-5px)'" onmouseout="this.style.transform='translateY(0)'">
+            <div class="card-body text-center">
+                <i class="fas fa-poll" style="font-size: 3rem; color: #0d6efd; opacity: 0.8; margin-bottom: 15px;"></i>
+                <h6 style="margin: 0; color: #212529;">Encuestas</h6>
+                <small style="color: #6c757d;">Gestionar encuestas</small>
+            </div>
+        </a>
+    </div>
+</div>
+
+<!-- Estadísticas Adicionales -->
+<div class="row mb-4">
+    <div class="col-md-6">
+        <div class="card">
+            <div class="card-header">
+                <h5 class="mb-0"><i class="fas fa-users"></i> Personal Académico</h5>
+            </div>
+            <div class="card-body">
+                <div class="row text-center">
+                    <div class="col-6">
+                        <h3 style="color: #0dcaf0; margin: 0;">{{ total_docentes }}</h3>
+                        <small style="color: #6c757d;">Docentes Asesores</small>
+                    </div>
+                    <div class="col-6">
+                        <h3 style="color: #198754; margin: 0;">{{ total_instructores }}</h3>
+                        <small style="color: #6c757d;">Instructores</small>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <div class="col-md-6">
+        <div class="card">
+            <div class="card-header">
+                <h5 class="mb-0"><i class="fas fa-chart-pie"></i> Postulaciones</h5>
+            </div>
+            <div class="card-body">
+                <div class="row text-center">
+                    <div class="col-4">
+                        <h3 style="color: #ffc107; margin: 0;">{{ postulaciones_pendientes }}</h3>
+                        <small style="color: #6c757d;">En Revisión</small>
+                    </div>
+                    <div class="col-4">
+                        <h3 style="color: #198754; margin: 0;">{{ postulaciones_aceptadas }}</h3>
+                        <small style="color: #6c757d;">Aceptadas</small>
+                    </div>
+                    <div class="col-4">
+                        <h3 style="color: #dc3545; margin: 0;">{{ total_postulaciones|add:"-"|add:postulaciones_pendientes|add:"-"|add:postulaciones_aceptadas }}</h3>
+                        <small style="color: #6c757d;">Rechazadas</small>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+
+<!-- Estado de Prácticas -->
+<div class="card mb-4">
+    <div class="card-header">
+        <h5 class="mb-0"><i class="fas fa-briefcase"></i> Estado de Prácticas</h5>
+    </div>
+    <div class="card-body">
+        <div class="row text-center">
+            <div class="col-md-4">
+                <h3 style="color: #198754; margin: 0;">{{ practicas_activas }}</h3>
+                <small style="color: #6c757d;">En Curso</small>
+            </div>
+            <div class="col-md-4">
+                <h3 style="color: #0dcaf0; margin: 0;">{{ practicas_finalizadas }}</h3>
+                <small style="color: #6c757d;">Finalizadas</small>
+            </div>
+            <div class="col-md-4">
+                <h3 style="color: #6c757d; margin: 0;">{{ total_practicas }}</h3>
+                <small style="color: #6c757d;">Total</small>
+            </div>
+        </div>
+    </div>
+</div>
+
+{% endblock %}
+

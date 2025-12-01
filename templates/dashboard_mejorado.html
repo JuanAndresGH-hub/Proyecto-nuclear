@@ -1,0 +1,199 @@
+{% extends 'base.html' %}
+
+{% block title %}Dashboard - Sistema de Gestión de Prácticas{% endblock %}
+
+{% block topbar_title %}Dashboard{% endblock %}
+
+{% block content %}
+<div class="page-header">
+    <h1><i class="fas fa-home"></i> Bienvenido, {{ user.first_name }}!</h1>
+    <p>Tu panel de control de prácticas empresariales</p>
+</div>
+
+{% if user.rol == 'ESTUDIANTE' %}
+    <!-- Estado de Hoja de Vida -->
+    <div class="row mb-4">
+        <div class="col-md-4 col-sm-6 mb-3">
+            <div class="card" style="border-top: 4px solid {% if perfil.estado_hv == 'APROBADA' %}#27ae60{% elif perfil.estado_hv == 'RECHAZADA' %}#e74c3c{% else %}#f39c12{% endif %};">
+                <div class="card-body text-center">
+                    <h2 style="font-size: 2.5rem; margin-bottom: 10px;">
+                        {% if perfil.estado_hv == 'APROBADA' %}
+                            <i class="fas fa-check-circle" style="color: #27ae60;"></i>
+                        {% elif perfil.estado_hv == 'RECHAZADA' %}
+                            <i class="fas fa-times-circle" style="color: #e74c3c;"></i>
+                        {% else %}
+                            <i class="fas fa-hourglass-half" style="color: #f39c12;"></i>
+                        {% endif %}
+                    </h2>
+                    <h5>Hoja de Vida</h5>
+                    <p class="text-muted" style="font-size: 0.9rem;">
+                        {% if perfil.estado_hv == 'APROBADA' %}
+                            ✅ Aprobada
+                        {% elif perfil.estado_hv == 'RECHAZADA' %}
+                            ❌ Rechazada
+                        {% else %}
+                            ⏳ En revisión
+                        {% endif %}
+                    </p>
+                </div>
+            </div>
+        </div>
+
+        <div class="col-md-4 col-sm-6 mb-3">
+            <div class="card" style="border-top: 4px solid #3498db;">
+                <div class="card-body text-center">
+                    <h2 style="font-size: 2.5rem; margin-bottom: 10px; color: #3498db;">
+                        <i class="fas fa-briefcase"></i>
+                    </h2>
+                    <h5>Práctica Actual</h5>
+                    <p class="text-muted" style="font-size: 0.9rem;">Práctica {{ perfil.practica_actual }} de 5</p>
+                </div>
+            </div>
+        </div>
+
+        <div class="col-md-4 col-sm-6 mb-3">
+            <div class="card" style="border-top: 4px solid #27ae60;">
+                <div class="card-body text-center">
+                    <h2 style="font-size: 2.5rem; margin-bottom: 10px; color: #27ae60;">
+                        <i class="fas fa-book"></i>
+                    </h2>
+                    <h5>Semestre</h5>
+                    <p class="text-muted" style="font-size: 0.9rem;">Semestre {{ perfil.semestre }}</p>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <!-- Acciones Rápidas -->
+    <div class="row mb-4">
+        <div class="col-12">
+            <h3 style="margin-bottom: 20px;">Acciones Rápidas</h3>
+        </div>
+        <div class="col-md-3 col-sm-6 mb-3">
+            <a href="#" class="btn btn-primary btn-block w-100" style="padding: 15px; text-decoration: none;">
+                <i class="fas fa-search"></i> Ver Vacantes
+            </a>
+        </div>
+        <div class="col-md-3 col-sm-6 mb-3">
+            <a href="#" class="btn btn-info btn-block w-100" style="padding: 15px; text-decoration: none;">
+                <i class="fas fa-file"></i> Mi Documentación
+            </a>
+        </div>
+        <div class="col-md-3 col-sm-6 mb-3">
+            <a href="#" class="btn btn-success btn-block w-100" style="padding: 15px; text-decoration: none;">
+                <i class="fas fa-star"></i> Mis Evaluaciones
+            </a>
+        </div>
+        <div class="col-md-3 col-sm-6 mb-3">
+            <a href="{% url 'profile' %}" class="btn btn-warning btn-block w-100" style="padding: 15px; text-decoration: none;">
+                <i class="fas fa-user"></i> Mi Perfil
+            </a>
+        </div>
+    </div>
+
+{% elif user.rol == 'COORDINADOR' %}
+    <!-- Cards de Estadísticas -->
+    <div class="row mb-4">
+        <div class="col-md-3 col-sm-6 mb-3">
+            <div class="card text-center">
+                <div class="card-body">
+                    <h2 style="font-size: 2.5rem; color: #3498db; margin-bottom: 10px;">
+                        <i class="fas fa-users"></i>
+                    </h2>
+                    <h5>Estudiantes</h5>
+                    <p class="text-muted">Total registrados</p>
+                </div>
+            </div>
+        </div>
+
+        <div class="col-md-3 col-sm-6 mb-3">
+            <div class="card text-center">
+                <div class="card-body">
+                    <h2 style="font-size: 2.5rem; color: #27ae60; margin-bottom: 10px;">
+                        <i class="fas fa-building"></i>
+                    </h2>
+                    <h5>Empresas</h5>
+                    <p class="text-muted">Total convenios</p>
+                </div>
+            </div>
+        </div>
+
+        <div class="col-md-3 col-sm-6 mb-3">
+            <div class="card text-center">
+                <div class="card-body">
+                    <h2 style="font-size: 2.5rem; color: #f39c12; margin-bottom: 10px;">
+                        <i class="fas fa-briefcase"></i>
+                    </h2>
+                    <h5>Vacantes</h5>
+                    <p class="text-muted">Disponibles</p>
+                </div>
+            </div>
+        </div>
+
+        <div class="col-md-3 col-sm-6 mb-3">
+            <div class="card text-center">
+                <div class="card-body">
+                    <h2 style="font-size: 2.5rem; color: #e74c3c; margin-bottom: 10px;">
+                        <i class="fas fa-handshake"></i>
+                    </h2>
+                    <h5>En Práctica</h5>
+                    <p class="text-muted">Actualmente</p>
+                </div>
+            </div>
+        </div>
+    </div>
+
+{% elif user.rol == 'DOCENTE' %}
+    <!-- Información para Docentes -->
+    <div class="row mb-4">
+        <div class="col-md-6">
+            <div class="card">
+                <div class="card-header">
+                    <i class="fas fa-users"></i> Estudiantes Asignados
+                </div>
+                <div class="card-body">
+                    <p>Número total de estudiantes a su cargo</p>
+                </div>
+            </div>
+        </div>
+        <div class="col-md-6">
+            <div class="card">
+                <div class="card-header">
+                    <i class="fas fa-calendar"></i> Encuentros Semanales
+                </div>
+                <div class="card-body">
+                    <p>Próximos encuentros programados</p>
+                </div>
+            </div>
+        </div>
+    </div>
+
+{% elif user.rol == 'INSTRUCTOR' %}
+    <!-- Información para Instructores -->
+    <div class="row mb-4">
+        <div class="col-md-6">
+            <div class="card">
+                <div class="card-header">
+                    <i class="fas fa-users"></i> Mis Practicantes
+                </div>
+                <div class="card-body">
+                    <p>Practicantes bajo su supervisión</p>
+                </div>
+            </div>
+        </div>
+        <div class="col-md-6">
+            <div class="card">
+                <div class="card-header">
+                    <i class="fas fa-pencil-alt"></i> Evaluaciones Pendientes
+                </div>
+                <div class="card-body">
+                    <p>Evaluaciones por realizar</p>
+                </div>
+            </div>
+        </div>
+    </div>
+
+{% endif %}
+
+{% endblock %}
+

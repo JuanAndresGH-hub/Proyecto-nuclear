@@ -1,0 +1,206 @@
+{% extends 'base.html' %}
+{% load static %}
+
+{% block title %}Revisar Hojas de Vida - Sistema de Gestión de Prácticas{% endblock %}
+
+{% block topbar_title %}Revisar Hojas de Vida{% endblock %}
+
+{% block content %}
+<div class="page-header">
+    <h1><i class="fas fa-clipboard-check"></i> Revisar Hojas de Vida</h1>
+    <p>Aprueba o rechaza las hojas de vida de los estudiantes</p>
+</div>
+
+<!-- Estadísticas -->
+<div class="row mb-4">
+    <div class="col-md-4">
+        <div class="card" style="border-top: 3px solid #ffc107;">
+            <div class="card-body text-center">
+                <h2 style="font-size: 2.5rem; margin-bottom: 10px; color: #ffc107; opacity: 0.8;">
+                    <i class="fas fa-hourglass-half"></i>
+                </h2>
+                <h5 style="margin-bottom: 8px; color: #212529;">Pendientes</h5>
+                <p class="text-muted" style="font-size: 1.5rem; margin-bottom: 0; font-weight: 700; color: #212529;">
+                    {{ total_pendientes }}
+                </p>
+            </div>
+        </div>
+    </div>
+
+    <div class="col-md-4">
+        <div class="card" style="border-top: 3px solid #198754;">
+            <div class="card-body text-center">
+                <h2 style="font-size: 2.5rem; margin-bottom: 10px; color: #198754; opacity: 0.8;">
+                    <i class="fas fa-check-circle"></i>
+                </h2>
+                <h5 style="margin-bottom: 8px; color: #212529;">Aprobadas</h5>
+                <p class="text-muted" style="font-size: 1.5rem; margin-bottom: 0; font-weight: 700; color: #212529;">
+                    {{ total_aprobadas }}
+                </p>
+            </div>
+        </div>
+    </div>
+
+    <div class="col-md-4">
+        <div class="card" style="border-top: 3px solid #dc3545;">
+            <div class="card-body text-center">
+                <h2 style="font-size: 2.5rem; margin-bottom: 10px; color: #dc3545; opacity: 0.8;">
+                    <i class="fas fa-times-circle"></i>
+                </h2>
+                <h5 style="margin-bottom: 8px; color: #212529;">Rechazadas</h5>
+                <p class="text-muted" style="font-size: 1.5rem; margin-bottom: 0; font-weight: 700; color: #212529;">
+                    {{ total_rechazadas }}
+                </p>
+            </div>
+        </div>
+    </div>
+</div>
+
+<!-- Lista de Hojas de Vida Pendientes -->
+<div class="card">
+    <div class="card-header">
+        <h5 class="mb-0"><i class="fas fa-list"></i> Hojas de Vida Pendientes de Revisión</h5>
+    </div>
+    <div class="card-body">
+        {% if estudiantes_pendientes %}
+            <div class="table-responsive">
+                <table class="table table-hover">
+                    <thead>
+                        <tr>
+                            <th>Estudiante</th>
+                            <th>Programa</th>
+                            <th>Semestre</th>
+                            <th>Archivo</th>
+                            <th>Fecha de Carga</th>
+                            <th>Acciones</th>
+                        </tr>
+                    </thead>
+                    <tbody>
+                        {% for estudiante in estudiantes_pendientes %}
+                        <tr>
+                            <td>
+                                <strong>{{ estudiante.usuario.get_full_name }}</strong>
+                                <br>
+                                <small class="text-muted">{{ estudiante.usuario.email }}</small>
+                            </td>
+                            <td>{{ estudiante.programa_academico }}</td>
+                            <td class="text-center">{{ estudiante.semestre }}</td>
+                            <td>
+                                <a href="{{ estudiante.hv_archivo.url }}" target="_blank" class="btn btn-sm btn-dark">
+                                    <i class="fas fa-file-pdf"></i> Ver PDF
+                                </a>
+                            </td>
+                            <td>{{ estudiante.fecha_creacion|date:"d/m/Y H:i" }}</td>
+                            <td>
+                                <button class="btn btn-sm btn-success" onclick="aprobarHojaVida({{ estudiante.id }}, '{{ estudiante.usuario.get_full_name }}')">
+                                    <i class="fas fa-check"></i> Aprobar
+                                </button>
+                                <button class="btn btn-sm btn-danger" onclick="rechazarHojaVida({{ estudiante.id }}, '{{ estudiante.usuario.get_full_name }}')">
+                                    <i class="fas fa-times"></i> Rechazar
+                                </button>
+                            </td>
+                        </tr>
+                        {% endfor %}
+                    </tbody>
+                </table>
+            </div>
+        {% else %}
+            <div style="text-align: center; color: #6c757d; padding: 60px 20px;">
+                <i class="fas fa-check-circle" style="font-size: 3rem; color: #198754; opacity: 0.5; margin-bottom: 20px; display: block;"></i>
+                <h5 style="color: #212529; margin-bottom: 10px;">¡Excelente!</h5>
+                <p>No hay hojas de vida pendientes de revisión.</p>
+            </div>
+        {% endif %}
+    </div>
+</div>
+
+<!-- Modal de Confirmación para Aprobar -->
+<div class="modal fade" id="aprobarModal" tabindex="-1">
+    <div class="modal-dialog">
+        <div class="modal-content">
+            <div class="modal-header bg-success text-white">
+                <h5 class="modal-title"><i class="fas fa-check-circle"></i> Aprobar Hoja de Vida</h5>
+                <button type="button" class="btn-close btn-close-white" data-bs-dismiss="modal"></button>
+            </div>
+            <form method="POST" id="formAprobar">
+                {% csrf_token %}
+                <input type="hidden" name="accion" value="aprobar">
+                <div class="modal-body">
+                    <p>¿Estás seguro de que deseas <strong>APROBAR</strong> la hoja de vida de <strong id="nombreEstudianteAprobar"></strong>?</p>
+                    <div class="alert alert-success">
+                        <i class="fas fa-info-circle"></i> El estudiante podrá comenzar a postularse a vacantes.
+                    </div>
+                    <div class="form-group">
+                        <label class="form-label">Comentarios (opcional)</label>
+                        <textarea name="comentarios" class="form-control" rows="3" placeholder="Agrega comentarios si lo deseas..."></textarea>
+                    </div>
+                </div>
+                <div class="modal-footer">
+                    <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Cancelar</button>
+                    <button type="submit" class="btn btn-success">
+                        <i class="fas fa-check"></i> Confirmar Aprobación
+                    </button>
+                </div>
+            </form>
+        </div>
+    </div>
+</div>
+
+<!-- Modal de Confirmación para Rechazar -->
+<div class="modal fade" id="rechazarModal" tabindex="-1">
+    <div class="modal-dialog">
+        <div class="modal-content">
+            <div class="modal-header bg-danger text-white">
+                <h5 class="modal-title"><i class="fas fa-times-circle"></i> Rechazar Hoja de Vida</h5>
+                <button type="button" class="btn-close btn-close-white" data-bs-dismiss="modal"></button>
+            </div>
+            <form method="POST" id="formRechazar">
+                {% csrf_token %}
+                <input type="hidden" name="accion" value="rechazar">
+                <div class="modal-body">
+                    <p>¿Estás seguro de que deseas <strong>RECHAZAR</strong> la hoja de vida de <strong id="nombreEstudianteRechazar"></strong>?</p>
+                    <div class="alert alert-danger">
+                        <i class="fas fa-exclamation-triangle"></i> El estudiante deberá subir una nueva hoja de vida.
+                    </div>
+                    <div class="form-group">
+                        <label class="form-label">Motivo del rechazo (recomendado)</label>
+                        <textarea name="comentarios" class="form-control" rows="3" placeholder="Explica por qué se rechaza la hoja de vida..." required></textarea>
+                    </div>
+                </div>
+                <div class="modal-footer">
+                    <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Cancelar</button>
+                    <button type="submit" class="btn btn-danger">
+                        <i class="fas fa-times"></i> Confirmar Rechazo
+                    </button>
+                </div>
+            </form>
+        </div>
+    </div>
+</div>
+
+{% endblock %}
+
+{% block extra_js %}
+<script>
+let estudianteIdActual = null;
+
+function aprobarHojaVida(estudianteId, nombreEstudiante) {
+    estudianteIdActual = estudianteId;
+    document.getElementById('nombreEstudianteAprobar').textContent = nombreEstudiante;
+    document.getElementById('formAprobar').action = `/api/usuarios/estudiantes/${estudianteId}/aprobar-rechazar-hv/`;
+
+    const modal = new bootstrap.Modal(document.getElementById('aprobarModal'));
+    modal.show();
+}
+
+function rechazarHojaVida(estudianteId, nombreEstudiante) {
+    estudianteIdActual = estudianteId;
+    document.getElementById('nombreEstudianteRechazar').textContent = nombreEstudiante;
+    document.getElementById('formRechazar').action = `/api/usuarios/estudiantes/${estudianteId}/aprobar-rechazar-hv/`;
+
+    const modal = new bootstrap.Modal(document.getElementById('rechazarModal'));
+    modal.show();
+}
+</script>
+{% endblock %}
+

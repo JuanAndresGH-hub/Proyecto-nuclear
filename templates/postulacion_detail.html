@@ -1,0 +1,231 @@
+{% extends 'base.html' %}
+{% load static %}
+
+{% block title %}Postulación - Sistema de Gestión de Prácticas{% endblock %}
+
+{% block topbar_title %}Detalle de Postulación{% endblock %}
+
+{% block content %}
+<div class="page-header">
+    <h1>
+        <i class="fas fa-file-alt"></i>
+        Detalle de Postulación
+    </h1>
+    <p>Información de tu postulación a la vacante</p>
+</div>
+
+<!-- Estado de la postulación -->
+<div class="alert {% if postulacion.estado == 'ACEPTADA' %}alert-success{% elif postulacion.estado == 'RECHAZADA' %}alert-danger{% else %}alert-warning{% endif %}">
+    <div class="d-flex align-items-center">
+        <div style="flex: 1;">
+            <h5 class="mb-2">
+                {% if postulacion.estado == 'EN_REVISION' %}
+                    <i class="fas fa-clock"></i> En Revisión
+                {% elif postulacion.estado == 'ACEPTADA' %}
+                    <i class="fas fa-check-circle"></i> Postulación Aceptada
+                {% elif postulacion.estado == 'RECHAZADA' %}
+                    <i class="fas fa-times-circle"></i> Postulación Rechazada
+                {% endif %}
+            </h5>
+            <p class="mb-0">
+                {% if postulacion.estado == 'EN_REVISION' %}
+                    Tu postulación está siendo revisada por el coordinador.
+                {% elif postulacion.estado == 'ACEPTADA' %}
+                    ¡Felicitaciones! Tu postulación ha sido aceptada.
+                {% elif postulacion.estado == 'RECHAZADA' %}
+                    Tu postulación no fue aceptada.
+                {% endif %}
+            </p>
+        </div>
+        <div>
+            <span class="badge {% if postulacion.estado == 'ACEPTADA' %}bg-success{% elif postulacion.estado == 'RECHAZADA' %}bg-danger{% else %}bg-warning text-dark{% endif %}"
+                  style="font-size: 1rem; padding: 10px 20px;">
+                {{ postulacion.get_estado_display }}
+            </span>
+        </div>
+    </div>
+</div>
+
+<div class="row">
+    <!-- Información de la Vacante -->
+    <div class="col-md-8">
+        <div class="card mb-4">
+            <div class="card-header" style="background-color: #198754; color: white;">
+                <h5 class="mb-0"><i class="fas fa-briefcase"></i> Información de la Vacante</h5>
+            </div>
+            <div class="card-body">
+                <h4 class="mb-3">{{ postulacion.vacante.titulo }}</h4>
+
+                <div class="mb-3">
+                    <strong><i class="fas fa-building text-primary"></i> Empresa:</strong>
+                    <p class="mb-0 ms-4">{{ postulacion.vacante.empresa.nombre }}</p>
+                </div>
+
+                <div class="row">
+                    <div class="col-md-6">
+                        <div class="mb-3">
+                            <strong><i class="fas fa-map-marker-alt text-info"></i> Modalidad:</strong>
+                            <p class="mb-0 ms-4">{{ postulacion.vacante.get_modalidad_display }}</p>
+                        </div>
+                    </div>
+                    <div class="col-md-6">
+                        <div class="mb-3">
+                            <strong><i class="fas fa-clock text-warning"></i> Duración:</strong>
+                            <p class="mb-0 ms-4">{{ postulacion.vacante.duracion_meses }} meses</p>
+                        </div>
+                    </div>
+                </div>
+
+                {% if postulacion.vacante.salario_rango %}
+                <div class="mb-3">
+                    <strong><i class="fas fa-money-bill-wave text-success"></i> Rango Salarial:</strong>
+                    <p class="mb-0 ms-4">{{ postulacion.vacante.salario_rango }}</p>
+                </div>
+                {% endif %}
+
+                <hr>
+
+                <div class="mb-3">
+                    <strong><i class="fas fa-align-left text-primary"></i> Descripción:</strong>
+                    <p class="mb-0 ms-4 text-justify" style="line-height: 1.6;">{{ postulacion.vacante.descripcion }}</p>
+                </div>
+
+                <div class="mb-3">
+                    <strong><i class="fas fa-user-check text-success"></i> Perfil Requerido:</strong>
+                    <p class="mb-0 ms-4 text-justify" style="line-height: 1.6;">{{ postulacion.vacante.perfil_requerido }}</p>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <!-- Información de la Postulación -->
+    <div class="col-md-4">
+        <div class="card mb-3">
+            <div class="card-header" style="background-color: #0dcaf0; color: white;">
+                <h6 class="mb-0"><i class="fas fa-info-circle"></i> Detalles de Postulación</h6>
+            </div>
+            <div class="card-body">
+                <div class="mb-3">
+                    <small class="text-muted">Fecha de Postulación</small>
+                    <p class="mb-0 fw-bold">{{ postulacion.fecha_postulacion|date:"d/m/Y H:i" }}</p>
+                </div>
+
+                <div class="mb-3">
+                    <small class="text-muted">Última Actualización</small>
+                    <p class="mb-0 fw-bold">{{ postulacion.fecha_actualizacion|date:"d/m/Y H:i" }}</p>
+                </div>
+
+                <div class="mb-3">
+                    <small class="text-muted">Origen</small>
+                    <p class="mb-0 fw-bold">{{ postulacion.get_origen_display }}</p>
+                </div>
+
+                <div class="mb-3">
+                    <small class="text-muted">Estado</small>
+                    <p class="mb-0">
+                        <span class="badge {% if postulacion.estado == 'ACEPTADA' %}bg-success{% elif postulacion.estado == 'RECHAZADA' %}bg-danger{% else %}bg-warning text-dark{% endif %}">
+                            {{ postulacion.get_estado_display }}
+                        </span>
+                    </p>
+                </div>
+
+                {% if postulacion.estado == 'RECHAZADA' and postulacion.motivo_rechazo %}
+                <hr>
+                <div>
+                    <small class="text-muted">Motivo del Rechazo</small>
+                    <p class="mb-0 text-danger">{{ postulacion.motivo_rechazo }}</p>
+                </div>
+                {% endif %}
+            </div>
+        </div>
+
+        <!-- Datos del Estudiante -->
+        <div class="card">
+            <div class="card-header" style="background-color: #6f42c1; color: white;">
+                <h6 class="mb-0"><i class="fas fa-user-graduate"></i> Tus Datos</h6>
+            </div>
+            <div class="card-body">
+                <div class="mb-3">
+                    <small class="text-muted">Nombre</small>
+                    <p class="mb-0 fw-bold">{{ postulacion.estudiante.usuario.get_full_name }}</p>
+                </div>
+
+                <div class="mb-3">
+                    <small class="text-muted">Programa</small>
+                    <p class="mb-0">{{ postulacion.estudiante.programa_academico }}</p>
+                </div>
+
+                <div class="mb-3">
+                    <small class="text-muted">Semestre</small>
+                    <p class="mb-0">{{ postulacion.estudiante.semestre }}°</p>
+                </div>
+
+                <div class="mb-3">
+                    <small class="text-muted">Correo</small>
+                    <p class="mb-0">{{ postulacion.estudiante.usuario.email }}</p>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+
+<div class="mt-4">
+    <a href="{% url 'empresas:vacantes_list' %}" class="btn btn-secondary">
+        <i class="fas fa-arrow-left"></i> Ver Más Vacantes
+    </a>
+    <a href="{% if user.es_estudiante %}{% url 'dashboard_estudiante' %}{% elif user.es_coordinador %}{% url 'dashboard_coordinador' %}{% elif user.es_docente %}{% url 'dashboard_docente' %}{% elif user.es_instructor %}{% url 'dashboard_instructor' %}{% else %}{% url 'home' %}{% endif %}" class="btn btn-dark">
+        <i class="fas fa-home"></i> Volver al Dashboard
+    </a>
+</div>
+
+<style>
+    .page-header {
+        margin-bottom: 30px;
+    }
+
+    .page-header h1 {
+        font-size: 2rem;
+        margin-bottom: 10px;
+    }
+
+    .page-header p {
+        color: #6c757d;
+        margin: 0;
+    }
+
+    .card {
+        border: none;
+        box-shadow: 0 2px 4px rgba(0,0,0,0.1);
+    }
+
+    .text-justify {
+        text-align: justify;
+    }
+
+    .btn-dark {
+        background-color: #000;
+        border-color: #000;
+    }
+
+    .btn-dark:hover {
+        background-color: #fff;
+        color: #000;
+        border-color: #000;
+        box-shadow: 0 2px 8px rgba(0,0,0,0.15);
+    }
+
+    .btn-secondary {
+        background-color: #6c757d;
+        border-color: #6c757d;
+    }
+
+    .btn-secondary:hover {
+        background-color: #fff;
+        color: #6c757d;
+        border-color: #6c757d;
+        box-shadow: 0 2px 8px rgba(0,0,0,0.15);
+    }
+</style>
+
+{% endblock %}
+

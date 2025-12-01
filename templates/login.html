@@ -1,0 +1,539 @@
+<!DOCTYPE html>
+{% load static %}
+<!DOCTYPE html>
+<html lang="es">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Iniciar Sesión - Sistema de Gestión de Prácticas</title>
+
+    <!-- Bootstrap CSS -->
+    <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/css/bootstrap.min.css" rel="stylesheet">
+    <!-- Font Awesome -->
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+    <!-- Google Fonts -->
+    <link href="https://fonts.googleapis.com/css2?family=Segoe+UI:wght@300;400;600;700&display=swap" rel="stylesheet">
+
+    <style>
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+
+        html, body {
+            height: 100%;
+            width: 100%;
+        }
+
+        body {
+            font-family: 'Segoe UI', 'Roboto', sans-serif;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            background: linear-gradient(135deg, #f5f7fa 0%, #ffffff 100%);
+            overflow: hidden;
+        }
+
+        .login-container {
+            display: grid;
+            grid-template-columns: 1fr 1fr;
+            width: 95%;
+            max-width: 1000px;
+            height: auto;
+            background: white;
+            border-radius: 16px;
+            box-shadow: 0 20px 60px rgba(0, 0, 0, 0.08);
+            overflow: hidden;
+            animation: fadeIn 0.6s ease-out;
+        }
+
+        @keyframes fadeIn {
+            from {
+                opacity: 0;
+                transform: translateY(20px);
+            }
+            to {
+                opacity: 1;
+                transform: translateY(0);
+            }
+        }
+
+        .login-left {
+            background: linear-gradient(135deg, #ffffff 0%, #f8f9fa 100%);
+            padding: 60px 40px;
+            display: flex;
+            flex-direction: column;
+            justify-content: center;
+            align-items: center;
+            text-align: center;
+            border-right: 1px solid #e9ecef;
+        }
+
+        .login-left i {
+            font-size: 72px;
+            color: #495057;
+            margin-bottom: 20px;
+            animation: float 3s ease-in-out infinite;
+        }
+
+        @keyframes float {
+            0%, 100% { transform: translateY(0px); }
+            50% { transform: translateY(-15px); }
+        }
+
+        .login-left h2 {
+            font-size: 2.2rem;
+            font-weight: 700;
+            margin-bottom: 15px;
+            color: #212529;
+        }
+
+        .login-left p {
+            font-size: 1rem;
+            color: #6c757d;
+            line-height: 1.6;
+            margin-bottom: 30px;
+        }
+
+        .login-features {
+            display: flex;
+            flex-direction: column;
+            gap: 15px;
+            margin-top: 40px;
+            text-align: left;
+        }
+
+        .feature {
+            display: flex;
+            align-items: center;
+            gap: 12px;
+            font-size: 0.95rem;
+            color: #495057;
+            transition: all 0.3s ease;
+        }
+
+        .feature i {
+            font-size: 1.2rem;
+            color: #dee2e6;
+            width: 30px;
+            text-align: center;
+            transition: all 0.3s ease;
+        }
+
+        .feature:hover i {
+            color: #6c757d;
+        }
+
+        .login-right {
+            padding: 60px 40px;
+            display: flex;
+            flex-direction: column;
+            justify-content: center;
+        }
+
+        .login-header {
+            margin-bottom: 40px;
+            text-align: center;
+        }
+
+        .login-header h3 {
+            color: #212529;
+            font-weight: 700;
+            font-size: 1.8rem;
+            margin-bottom: 10px;
+        }
+
+        .login-header p {
+            color: #6c757d;
+            font-size: 0.95rem;
+        }
+
+        .form-group {
+            margin-bottom: 25px;
+            animation: slideInUp 0.5s ease-out;
+        }
+
+        @keyframes slideInUp {
+            from {
+                opacity: 0;
+                transform: translateY(10px);
+            }
+            to {
+                opacity: 1;
+                transform: translateY(0);
+            }
+        }
+
+        .form-label {
+            font-weight: 600;
+            color: #212529;
+            margin-bottom: 10px;
+            display: block;
+            font-size: 0.95rem;
+        }
+
+        .form-control {
+            border: 2px solid #e9ecef;
+            border-radius: 8px;
+            padding: 12px 14px;
+            font-size: 0.95rem;
+            transition: all 0.3s ease;
+            background-color: #f8f9fa;
+            color: #212529;
+        }
+
+        .form-control::placeholder {
+            color: #adb5bd;
+        }
+
+        .form-control:focus {
+            border-color: #dee2e6;
+            background-color: white;
+            box-shadow: 0 0 0 3px rgba(33, 37, 41, 0.05);
+            outline: none;
+        }
+
+        .form-check {
+            margin-bottom: 20px;
+            display: flex;
+            align-items: center;
+            gap: 8px;
+        }
+
+        .form-check-input {
+            width: 18px;
+            height: 18px;
+            border: 2px solid #dee2e6;
+            border-radius: 4px;
+            cursor: pointer;
+            transition: all 0.3s ease;
+        }
+
+        .form-check-input:checked {
+            background-color: #495057;
+            border-color: #495057;
+        }
+
+        .form-check-label {
+            color: #212529;
+            cursor: pointer;
+            margin-bottom: 0;
+            font-size: 0.95rem;
+        }
+
+        .btn-login {
+            background: linear-gradient(135deg, #212529 0%, #495057 100%);
+            color: white;
+            border: none;
+            padding: 12px 20px;
+            border-radius: 8px;
+            font-weight: 600;
+            font-size: 1rem;
+            transition: all 0.3s ease;
+            width: 100%;
+            cursor: pointer;
+            margin-bottom: 20px;
+            box-shadow: 0 4px 12px rgba(33, 37, 41, 0.1);
+        }
+
+        .btn-login:hover {
+            transform: translateY(-2px);
+            box-shadow: 0 8px 20px rgba(33, 37, 41, 0.15);
+            color: white;
+        }
+
+        .btn-register {
+            background: white;
+            color: #495057;
+            border: 2px solid #dee2e6;
+            padding: 12px 20px;
+            border-radius: 8px;
+            font-weight: 600;
+            font-size: 1rem;
+            transition: all 0.3s ease;
+            width: 100%;
+            cursor: pointer;
+            text-decoration: none;
+            display: block;
+            text-align: center;
+        }
+
+        .btn-register:hover {
+            background: #f8f9fa;
+            border-color: #adb5bd;
+            color: #212529;
+            transform: translateY(-2px);
+        }
+
+        .divider {
+            text-align: center;
+            margin: 25px 0;
+            position: relative;
+            color: #adb5bd;
+            font-size: 0.9rem;
+        }
+
+        .divider::before {
+            content: '';
+            position: absolute;
+            left: 0;
+            top: 50%;
+            width: 100%;
+            height: 1px;
+            background: #e9ecef;
+            transform: translateY(-50%);
+        }
+
+        .divider span {
+            background: white;
+            padding: 0 10px;
+            position: relative;
+            z-index: 1;
+        }
+
+        .alert {
+            border: none;
+            border-radius: 8px;
+            padding: 14px 16px;
+            margin-bottom: 20px;
+            animation: slideIn 0.3s ease-out;
+            border-left: 4px solid #dc3545;
+            background-color: #f8d7da;
+            color: #721c24;
+        }
+
+        @keyframes slideIn {
+            from {
+                opacity: 0;
+                transform: translateY(-10px);
+            }
+            to {
+                opacity: 1;
+                transform: translateY(0);
+            }
+        }
+
+        .credentials-box {
+            background: #f8f9fa;
+            border-radius: 8px;
+            padding: 18px;
+            margin-top: 30px;
+            border-left: 4px solid #dee2e6;
+        }
+
+        .credentials-box h6 {
+            color: #212529;
+            font-weight: 700;
+            margin-bottom: 15px;
+            font-size: 0.9rem;
+        }
+
+        .credential-item {
+            display: flex;
+            align-items: center;
+            gap: 10px;
+            margin-bottom: 10px;
+            font-size: 0.85rem;
+            color: #495057;
+        }
+
+        .credential-item i {
+            color: #adb5bd;
+            font-size: 1rem;
+            width: 20px;
+            text-align: center;
+        }
+
+        .credential-item code {
+            background: white;
+            padding: 2px 6px;
+            border-radius: 4px;
+            color: #212529;
+            font-weight: 600;
+            border: 1px solid #e9ecef;
+        }
+
+        @media (max-width: 768px) {
+            .login-container {
+                grid-template-columns: 1fr;
+                max-width: 95%;
+            }
+
+            .login-left {
+                padding: 40px 30px;
+                border-right: none;
+                border-bottom: 1px solid #e9ecef;
+            }
+
+            .login-right {
+                padding: 40px 30px;
+            }
+
+            .login-left h2 {
+                font-size: 1.8rem;
+            }
+
+            .login-features {
+                margin-top: 30px;
+            }
+
+            .credentials-box {
+                margin-top: 20px;
+            }
+        }
+
+        @media (max-width: 480px) {
+            .login-container {
+                border-radius: 12px;
+            }
+
+            .login-left {
+                padding: 30px 20px;
+            }
+
+            .login-right {
+                padding: 30px 20px;
+            }
+
+            .login-header h3 {
+                font-size: 1.4rem;
+            }
+
+            .form-control,
+            .btn-login,
+            .btn-register {
+                font-size: 0.9rem;
+                padding: 11px 12px;
+            }
+
+            .login-left i {
+                font-size: 60px;
+            }
+        }
+    </style>
+</head>
+<body>
+    <div class="login-container">
+        <!-- Left Side -->
+        <div class="login-left">
+            <i class="fas fa-graduation-cap"></i>
+            <h2>Bienvenido</h2>
+            <p>Sistema integral de gestión de prácticas empresariales</p>
+
+            <div class="login-features">
+                <div class="feature">
+                    <i class="fas fa-check"></i>
+                    <span>Gestión de prácticas académicas</span>
+                </div>
+                <div class="feature">
+                    <i class="fas fa-check"></i>
+                    <span>Seguimiento empresarial</span>
+                </div>
+                <div class="feature">
+                    <i class="fas fa-check"></i>
+                    <span>Evaluaciones y reportes</span>
+                </div>
+                <div class="feature">
+                    <i class="fas fa-check"></i>
+                    <span>Documentación integrada</span>
+                </div>
+            </div>
+        </div>
+
+        <!-- Right Side -->
+        <div class="login-right">
+            <div class="login-header">
+                <h3>Iniciar Sesión</h3>
+                <p>Ingresa tus credenciales para acceder</p>
+            </div>
+
+            {% if error %}
+                <div class="alert alert-dismissible fade show" role="alert">
+                    <i class="fas fa-exclamation-circle"></i> {{ error }}
+                    <button type="button" class="btn-close" data-bs-dismiss="alert" aria-label="Close"></button>
+                </div>
+            {% endif %}
+
+            <form method="POST" action="{% url 'login' %}">
+                {% csrf_token %}
+
+                <div class="form-group">
+                    <label for="username" class="form-label">
+                        <i class="fas fa-user"></i> Usuario
+                    </label>
+                    <input
+                        type="text"
+                        class="form-control"
+                        id="username"
+                        name="username"
+                        placeholder="Tu nombre de usuario"
+                        required
+                        autofocus
+                    >
+                </div>
+
+                <div class="form-group">
+                    <label for="password" class="form-label">
+                        <i class="fas fa-lock"></i> Contraseña
+                    </label>
+                    <input
+                        type="password"
+                        class="form-control"
+                        id="password"
+                        name="password"
+                        placeholder="Tu contraseña"
+                        required
+                    >
+                </div>
+
+                <div class="form-check">
+                    <input class="form-check-input" type="checkbox" id="remember" name="remember">
+                    <label class="form-check-label" for="remember">
+                        Recuérdame en este dispositivo
+                    </label>
+                </div>
+
+                <button type="submit" class="btn-login">
+                    <i class="fas fa-sign-in-alt"></i> Iniciar Sesión
+                </button>
+            </form>
+
+            <div class="divider">
+                <span>¿No tienes cuenta?</span>
+            </div>
+
+            <a href="{% url 'usuarios:register' %}" class="btn-register">
+                <i class="fas fa-user-plus"></i> Crear Nueva Cuenta
+            </a>
+
+            <!-- Credentials Box -->
+            <div class="credentials-box">
+                <h6><i class="fas fa-info-circle"></i> Credenciales de Prueba</h6>
+                <div class="credential-item">
+                    <i class="fas fa-shield-alt"></i>
+                    <strong>Coordinador:</strong> <code>coordinador</code> / <code>123456</code>
+                </div>
+                <div class="credential-item">
+                    <i class="fas fa-book"></i>
+                    <strong>Estudiante:</strong> <code>ana_martinez</code> / <code>123456</code>
+                </div>
+                <div class="credential-item">
+                    <i class="fas fa-chalkboard"></i>
+                    <strong>Docente:</strong> <code>dr_garcia</code> / <code>123456</code>
+                </div>
+                <div class="credential-item">
+                    <i class="fas fa-building"></i>
+                    <strong>Instructor:</strong> <code>instructor_techcorp</code> / <code>123456</code>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <!-- Bootstrap JS -->
+    <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/js/bootstrap.bundle.min.js"></script>
+    <!-- Login Debug -->
+    <script src="{% static 'js/login-debug.js' %}"></script>
+</body>
+</html>
+

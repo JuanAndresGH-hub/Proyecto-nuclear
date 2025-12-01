@@ -1,0 +1,113 @@
+{% extends 'base.html' %}
+
+{% block title %}Mis Evaluaciones - Sistema de Gestión de Prácticas{% endblock %}
+
+{% block topbar_title %}Mis Evaluaciones{% endblock %}
+
+{% block content %}
+<div class="page-header">
+    <h1><i class="fas fa-star"></i> Mis Evaluaciones</h1>
+    <p>Revisa tus evaluaciones y calificaciones</p>
+</div>
+
+{% if evaluaciones_por_practica %}
+    {% for practica, data in evaluaciones_por_practica.items %}
+        <div class="card mb-4">
+            <div class="card-header" style="background: #f8f9fa; border-bottom: 1px solid #e9ecef;">
+                <div class="d-flex justify-content-between align-items-center">
+                    <h5 class="mb-0" style="color: #212529;">
+                        <i class="fas fa-graduation-cap"></i> Práctica {{ practica.numero }}
+                    </h5>
+                    {% if data.promedio >= 3.5 %}
+                        <span class="badge" style="background-color: #d1f0e3; color: #0f5130; padding: 8px 12px;">
+                            <i class="fas fa-check-circle"></i> Aprobada
+                        </span>
+                    {% else %}
+                        <span class="badge" style="background-color: #f8d7da; color: #842029; padding: 8px 12px;">
+                            <i class="fas fa-times-circle"></i> Por mejorar
+                        </span>
+                    {% endif %}
+                </div>
+            </div>
+
+            <div class="card-body">
+                <!-- Resumen de Calificación -->
+                <div style="display: grid; grid-template-columns: repeat(auto-fit, minmax(200px, 1fr)); gap: 15px; margin-bottom: 25px;">
+                    <div style="padding: 15px; background: #f8f9fa; border-radius: 8px; text-align: center;">
+                        <small style="color: #6c757d; display: block; margin-bottom: 5px;">
+                            <i class="fas fa-chart-bar"></i> Promedio General
+                        </small>
+                        <h3 style="margin: 0; color: {% if data.promedio >= 3.5 %}#198754{% else %}#dc3545{% endif %};">
+                            {{ data.promedio|default:"N/A" }}/5.0
+                        </h3>
+                    </div>
+
+                    <div style="padding: 15px; background: #f8f9fa; border-radius: 8px; text-align: center;">
+                        <small style="color: #6c757d; display: block; margin-bottom: 5px;">
+                            <i class="fas fa-tasks"></i> Evaluaciones
+                        </small>
+                        <h3 style="margin: 0; color: #212529;">{{ data.evaluaciones|length }}</h3>
+                    </div>
+
+                    <div style="padding: 15px; background: #f8f9fa; border-radius: 8px; text-align: center;">
+                        <small style="color: #6c757d; display: block; margin-bottom: 5px;">
+                            <i class="fas fa-circle"></i> Estado
+                        </small>
+                        <p style="margin: 0; color: #495057; font-weight: 500;">{{ data.estado }}</p>
+                    </div>
+                </div>
+
+                <!-- Lista de Evaluaciones -->
+                <div style="border-top: 1px solid #e9ecef; padding-top: 20px;">
+                    <h6 style="color: #212529; margin-bottom: 15px;">
+                        <i class="fas fa-list-check"></i> Evaluaciones Recibidas
+                    </h6>
+
+                    {% for evaluacion in data.evaluaciones %}
+                        <div style="margin-bottom: 12px; padding: 12px; background: #f8f9fa; border-radius: 8px;">
+                            <div class="d-flex justify-content-between align-items-start">
+                                <div style="flex: 1;">
+                                    <h6 style="margin: 0 0 5px 0; color: #212529;">
+                                        {{ evaluacion.get_tipo_evaluador_display }}
+                                        {% if evaluacion.rubro != 'Desempeño General' %}
+                                            - {{ evaluacion.rubro }}
+                                        {% endif %}
+                                    </h6>
+                                    <small style="color: #6c757d;">
+                                        <i class="fas fa-calendar"></i>
+                                        {{ evaluacion.fecha_evaluacion|date:"d/m/Y H:i" }}
+                                    </small>
+                                </div>
+                                <div style="text-align: right;">
+                                    <h5 style="margin: 0; color: {% if evaluacion.nota >= 3.5 %}#198754{% else %}#dc3545{% endif %};">
+                                        {{ evaluacion.nota }}/5.0
+                                    </h5>
+                                </div>
+                            </div>
+
+                            {% if evaluacion.comentarios %}
+                                <div style="margin-top: 10px; padding-top: 10px; border-top: 1px solid #e9ecef;">
+                                    <small style="color: #6c757d;">Comentarios:</small>
+                                    <p style="margin: 5px 0 0 0; color: #495057; font-size: 0.9rem;">
+                                        {{ evaluacion.comentarios }}
+                                    </p>
+                                </div>
+                            {% endif %}
+                        </div>
+                    {% endfor %}
+                </div>
+            </div>
+        </div>
+    {% endfor %}
+{% else %}
+    <div class="card">
+        <div class="card-body" style="text-align: center; padding: 60px 20px;">
+            <i class="fas fa-star" style="font-size: 3rem; color: #dee2e6; margin-bottom: 20px; display: block; opacity: 0.7;"></i>
+            <h5 style="color: #212529; margin-bottom: 10px;">No hay evaluaciones</h5>
+            <p style="color: #6c757d;">Las evaluaciones de tus prácticas aparecerán aquí.</p>
+        </div>
+    </div>
+{% endif %}
+
+{% endblock %}
+

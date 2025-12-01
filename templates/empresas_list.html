@@ -1,0 +1,85 @@
+{% extends 'base.html' %}
+{% load static %}
+
+{% block title %}Gestión de Empresas - Sistema de Gestión de Prácticas{% endblock %}
+
+{% block topbar_title %}Gestión de Empresas{% endblock %}
+
+{% block content %}
+<div class="page-header">
+    <h1><i class="fas fa-building"></i> Gestión de Empresas</h1>
+    <p>Administra las empresas y sus vacantes</p>
+</div>
+
+<!-- Estadísticas -->
+<div class="row mb-4">
+    <div class="col-md-4">
+        <div class="card" style="border-top: 3px solid #198754;">
+            <div class="card-body text-center">
+                <h2 style="font-size: 2.5rem; margin-bottom: 10px; color: #198754;">
+                    {{ empresas.count }}
+                </h2>
+                <p style="margin: 0; color: #6c757d;">Empresas Activas</p>
+            </div>
+        </div>
+    </div>
+</div>
+
+<!-- Lista de Empresas -->
+<div class="card">
+    <div class="card-header d-flex justify-content-between align-items-center">
+        <h5 class="mb-0"><i class="fas fa-list"></i> Lista de Empresas</h5>
+        <a href="{% url 'empresas:empresa_create' %}" class="btn btn-dark btn-sm">
+            <i class="fas fa-plus"></i> Nueva Empresa
+        </a>
+    </div>
+    <div class="card-body">
+        {% if empresas %}
+            <div class="row">
+                {% for empresa in empresas %}
+                <div class="col-md-6 mb-3">
+                    <div class="card">
+                        <div class="card-body">
+                            <h5 class="card-title">{{ empresa.nombre }}</h5>
+                            <p class="card-text">
+                                <i class="fas fa-map-marker-alt"></i> {{ empresa.ciudad }}<br>
+                                <i class="fas fa-id-card"></i> NIT: {{ empresa.nit }}<br>
+                                <i class="fas fa-envelope"></i> {{ empresa.correo }}<br>
+                                <i class="fas fa-phone"></i> {{ empresa.telefono }}
+                            </p>
+                            <hr>
+                            <div class="d-flex justify-content-between align-items-center">
+                                <span class="badge" style="background-color: #d1f0e3; color: #0f5130;">
+                                    <i class="fas fa-file-alt"></i> {{ empresa.vacantes.count }} vacantes
+                                </span>
+                                <div>
+                                    <a href="{% url 'empresas:empresa_detail' empresa.pk %}" class="btn btn-sm btn-dark">
+                                        <i class="fas fa-eye"></i> Ver
+                                    </a>
+                                    <a href="{% url 'empresas:empresa_edit' empresa.pk %}" class="btn btn-sm btn-dark">
+                                        <i class="fas fa-edit"></i> Editar
+                                    </a>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+                {% endfor %}
+            </div>
+        {% else %}
+            <p style="text-align: center; color: #6c757d; padding: 40px;">
+                <i class="fas fa-building" style="font-size: 3rem; opacity: 0.5; display: block; margin-bottom: 15px;"></i>
+                No hay empresas registradas aún.
+            </p>
+        {% endif %}
+    </div>
+</div>
+
+<div class="mt-4">
+    <a href="{% url 'dashboard_coordinador' %}" class="btn btn-dark">
+        <i class="fas fa-arrow-left"></i> Volver al Dashboard
+    </a>
+</div>
+
+{% endblock %}
+

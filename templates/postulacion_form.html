@@ -1,0 +1,315 @@
+{% extends 'base.html' %}
+{% load static %}
+
+{% block title %}Postularse a Vacante - Sistema de Gestión de Prácticas{% endblock %}
+
+{% block topbar_title %}Postularse a Vacante{% endblock %}
+
+{% block content %}
+<div class="page-header">
+    <h1>
+        <i class="fas fa-paper-plane"></i>
+        Postularse a una Vacante
+    </h1>
+    <p>Selecciona la vacante a la que deseas postularte</p>
+</div>
+
+<!-- Alerta de hoja de vida -->
+<div class="alert alert-info mb-4">
+    <i class="fas fa-info-circle"></i>
+    <strong>Requisito:</strong> Tu hoja de vida debe estar aprobada para poder postularte a vacantes.
+    {% if user.perfil_estudiante.estado_hv == 'APROBADA' %}
+        <span class="badge bg-success ms-2">✓ Tu hoja de vida está aprobada</span>
+    {% elif user.perfil_estudiante.estado_hv == 'EN_REVISION' %}
+        <span class="badge bg-warning text-dark ms-2">⏳ Tu hoja de vida está en revisión</span>
+    {% else %}
+        <span class="badge bg-danger ms-2">✗ Debes subir tu hoja de vida</span>
+    {% endif %}
+</div>
+
+{% if vacantes %}
+<div class="card">
+    <div class="card-body">
+        <form method="POST" id="postulacionForm">
+            {% csrf_token %}
+
+            <div class="mb-4">
+                <label for="vacante" class="form-label">
+                    <strong>Selecciona una Vacante</strong> <span class="text-danger">*</span>
+                </label>
+                <select class="form-control form-control-lg" id="vacante" name="vacante" required onchange="mostrarDetalleVacante()">
+                    <option value="">-- Selecciona una vacante --</option>
+                    {% for vac in vacantes %}
+                    <option value="{{ vac.pk }}"
+                            data-empresa="{{ vac.empresa.nombre }}"
+                            data-titulo="{{ vac.titulo }}"
+                            data-descripcion="{{ vac.descripcion }}"
+                            data-perfil="{{ vac.perfil_requerido }}"
+                            data-modalidad="{{ vac.get_modalidad_display }}"
+                            data-duracion="{{ vac.duracion_meses }}"
+                            data-plazas="{{ vac.cantidad_plazas }}"
+                            data-salario="{{ vac.salario_rango|default:'No especificado' }}"
+                            data-inicio="{{ vac.fecha_inicio_estimada|date:'d/m/Y' }}"
+                            data-fin="{{ vac.fecha_fin_estimada|date:'d/m/Y' }}">
+                        {{ vac.empresa.nombre }} - {{ vac.titulo }}
+                    </option>
+                    {% endfor %}
+                </select>
+            </div>
+
+            <!-- Detalle de la vacante seleccionada -->
+            <div id="detalleVacante" style="display: none;">
+                <div class="card mb-4" style="background-color: #f8f9fa; border: 2px solid #198754;">
+                    <div class="card-header" style="background-color: #198754; color: white;">
+                        <h5 class="mb-0"><i class="fas fa-info-circle"></i> Detalles de la Vacante</h5>
+                    </div>
+                    <div class="card-body">
+                        <div class="row">
+                            <div class="col-md-6">
+                                <div class="mb-3">
+                                    <strong><i class="fas fa-building text-primary"></i> Empresa:</strong>
+                                    <p id="detalle-empresa" class="mb-0 ms-4"></p>
+                                </div>
+                                <div class="mb-3">
+                                    <strong><i class="fas fa-briefcase text-success"></i> Título:</strong>
+                                    <p id="detalle-titulo" class="mb-0 ms-4"></p>
+                                </div>
+                                <div class="mb-3">
+                                    <strong><i class="fas fa-map-marker-alt text-info"></i> Modalidad:</strong>
+                                    <p id="detalle-modalidad" class="mb-0 ms-4"></p>
+                                </div>
+                                <div class="mb-3">
+                                    <strong><i class="fas fa-clock text-warning"></i> Duración:</strong>
+                                    <p id="detalle-duracion" class="mb-0 ms-4"></p>
+                                </div>
+                            </div>
+                            <div class="col-md-6">
+                                <div class="mb-3">
+                                    <strong><i class="fas fa-users text-secondary"></i> Plazas disponibles:</strong>
+                                    <p id="detalle-plazas" class="mb-0 ms-4"></p>
+                                </div>
+                                <div class="mb-3">
+                                    <strong><i class="fas fa-money-bill-wave text-success"></i> Salario:</strong>
+                                    <p id="detalle-salario" class="mb-0 ms-4"></p>
+                                </div>
+                                <div class="mb-3">
+                                    <strong><i class="fas fa-calendar-alt text-danger"></i> Fecha inicio:</strong>
+                                    <p id="detalle-inicio" class="mb-0 ms-4"></p>
+                                </div>
+                                <div class="mb-3">
+                                    <strong><i class="fas fa-calendar-check text-danger"></i> Fecha fin:</strong>
+                                    <p id="detalle-fin" class="mb-0 ms-4"></p>
+                                </div>
+                            </div>
+                        </div>
+
+                        <hr>
+
+                        <div class="mb-3">
+                            <strong><i class="fas fa-align-left text-primary"></i> Descripción:</strong>
+                            <p id="detalle-descripcion" class="mb-0 ms-4 text-justify" style="line-height: 1.6;"></p>
+                        </div>
+
+                        <div class="mb-3">
+                            <strong><i class="fas fa-user-check text-success"></i> Perfil Requerido:</strong>
+                            <p id="detalle-perfil" class="mb-0 ms-4 text-justify" style="line-height: 1.6;"></p>
+                        </div>
+                    </div>
+                </div>
+
+                <!-- Confirmación -->
+                <div class="alert alert-warning">
+                    <i class="fas fa-exclamation-triangle"></i>
+                    <strong>Importante:</strong>
+                    Al postularte, tu información será enviada a la empresa para revisión.
+                    Solo puedes tener una postulación activa por empresa.
+                </div>
+            </div>
+
+            <hr>
+
+            <!-- Botones -->
+            <div class="d-flex justify-content-between">
+                <a href="{% url 'empresas:vacantes_list' %}" class="btn btn-secondary">
+                    <i class="fas fa-times"></i> Cancelar
+                </a>
+                <button type="submit" class="btn btn-dark" id="btnPostular" disabled>
+                    <i class="fas fa-paper-plane"></i> Enviar Postulación
+                </button>
+            </div>
+        </form>
+    </div>
+</div>
+{% else %}
+<div class="card">
+    <div class="card-body text-center py-5">
+        <i class="fas fa-inbox" style="font-size: 4rem; color: #ccc; margin-bottom: 20px;"></i>
+        <h5 class="text-muted">No hay vacantes disponibles en este momento</h5>
+        <p class="text-muted">Revisa más tarde para ver nuevas oportunidades de práctica.</p>
+        <a href="{% if user.es_estudiante %}{% url 'dashboard_estudiante' %}{% elif user.es_coordinador %}{% url 'dashboard_coordinador' %}{% elif user.es_docente %}{% url 'dashboard_docente' %}{% elif user.es_instructor %}{% url 'dashboard_instructor' %}{% else %}{% url 'home' %}{% endif %}" class="btn btn-dark mt-3">
+            <i class="fas fa-home"></i> Volver al Dashboard
+        </a>
+    </div>
+</div>
+{% endif %}
+
+<style>
+    .page-header {
+        margin-bottom: 30px;
+    }
+
+    .page-header h1 {
+        font-size: 2rem;
+        margin-bottom: 10px;
+    }
+
+    .page-header p {
+        color: #6c757d;
+        margin: 0;
+    }
+
+    .card {
+        border: none;
+        box-shadow: 0 2px 4px rgba(0,0,0,0.1);
+    }
+
+    .form-label {
+        font-weight: 600;
+        margin-bottom: 8px;
+    }
+
+    .form-control:focus {
+        border-color: #000;
+        box-shadow: 0 0 0 0.2rem rgba(0,0,0,0.1);
+    }
+
+    .form-control-lg {
+        font-size: 1.1rem;
+        padding: 12px;
+    }
+
+    .text-danger {
+        color: #dc3545 !important;
+    }
+
+    .btn-dark {
+        background-color: #000;
+        border-color: #000;
+    }
+
+    .btn-dark:hover:not(:disabled) {
+        background-color: #fff;
+        color: #000;
+        border-color: #000;
+        box-shadow: 0 2px 8px rgba(0,0,0,0.15);
+    }
+
+    .btn-dark:disabled {
+        opacity: 0.5;
+        cursor: not-allowed;
+    }
+
+    .btn-secondary {
+        background-color: #6c757d;
+        border-color: #6c757d;
+    }
+
+    .btn-secondary:hover {
+        background-color: #fff;
+        color: #6c757d;
+        border-color: #6c757d;
+        box-shadow: 0 2px 8px rgba(0,0,0,0.15);
+    }
+
+    .alert {
+        border-radius: 8px;
+    }
+
+    .alert-info {
+        background-color: #d1ecf1;
+        border-color: #bee5eb;
+        color: #0c5460;
+    }
+
+    .alert-warning {
+        background-color: #fff3cd;
+        border-color: #ffc107;
+        color: #856404;
+    }
+
+    .badge {
+        font-size: 0.9rem;
+        padding: 6px 12px;
+    }
+
+    #detalleVacante .card-body p {
+        color: #495057;
+        font-size: 0.95rem;
+    }
+
+    #detalleVacante .card-body strong {
+        color: #212529;
+        font-size: 0.95rem;
+    }
+
+    .text-justify {
+        text-align: justify;
+    }
+</style>
+
+<script>
+function mostrarDetalleVacante() {
+    const select = document.getElementById('vacante');
+    const detalle = document.getElementById('detalleVacante');
+    const btnPostular = document.getElementById('btnPostular');
+
+    if (select.value) {
+        const option = select.options[select.selectedIndex];
+
+        // Mostrar detalle
+        detalle.style.display = 'block';
+        btnPostular.disabled = false;
+
+        // Llenar información
+        document.getElementById('detalle-empresa').textContent = option.dataset.empresa;
+        document.getElementById('detalle-titulo').textContent = option.dataset.titulo;
+        document.getElementById('detalle-descripcion').textContent = option.dataset.descripcion;
+        document.getElementById('detalle-perfil').textContent = option.dataset.perfil;
+        document.getElementById('detalle-modalidad').textContent = option.dataset.modalidad;
+        document.getElementById('detalle-duracion').textContent = option.dataset.duracion + ' meses';
+        document.getElementById('detalle-plazas').textContent = option.dataset.plazas;
+        document.getElementById('detalle-salario').textContent = option.dataset.salario;
+        document.getElementById('detalle-inicio').textContent = option.dataset.inicio;
+        document.getElementById('detalle-fin').textContent = option.dataset.fin;
+
+        // Scroll suave al detalle
+        detalle.scrollIntoView({ behavior: 'smooth', block: 'nearest' });
+    } else {
+        detalle.style.display = 'none';
+        btnPostular.disabled = true;
+    }
+}
+
+document.getElementById('postulacionForm').addEventListener('submit', function(e) {
+    const vacante = document.getElementById('vacante').value;
+
+    if (!vacante) {
+        e.preventDefault();
+        alert('Por favor selecciona una vacante');
+        return false;
+    }
+
+    // Confirmar postulación
+    const option = document.getElementById('vacante').options[document.getElementById('vacante').selectedIndex];
+    const empresaNombre = option.dataset.empresa;
+    const vacanteNombre = option.dataset.titulo;
+
+    if (!confirm(`¿Estás seguro de postularte a "${vacanteNombre}" en ${empresaNombre}?`)) {
+        e.preventDefault();
+        return false;
+    }
+});
+</script>
+
+{% endblock %}
+

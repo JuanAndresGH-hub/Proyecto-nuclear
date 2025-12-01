@@ -1,0 +1,126 @@
+{% extends 'base.html' %}
+{% load static %}
+
+{% block title %}Registrar Encuentro Semanal - Sistema de Gestión de Prácticas{% endblock %}
+
+{% block topbar_title %}Registrar Encuentro Semanal{% endblock %}
+
+{% block content %}
+<div class="page-header">
+    <h1><i class="fas fa-calendar-plus"></i> Registrar Nuevo Encuentro Semanal</h1>
+    <p>Registra el encuentro semanal con tu estudiante asignado</p>
+</div>
+
+<div class="row">
+    <div class="col-lg-8 mx-auto">
+        <div class="card">
+            <div class="card-header">
+                <h5 class="mb-0"><i class="fas fa-calendar-alt"></i> Información del Encuentro</h5>
+            </div>
+            <div class="card-body">
+                <form method="POST" action="{% url 'practicas:encuentro_create' %}">
+                    {% csrf_token %}
+
+                    <div class="form-group mb-3">
+                        <label class="form-label"><i class="fas fa-user-graduate"></i> Estudiante / Práctica *</label>
+                        <select name="practica" class="form-control" required>
+                            <option value="">Seleccione una práctica...</option>
+                            {% for practica in practicas %}
+                                <option value="{{ practica.pk }}">
+                                    {{ practica.estudiante.usuario.get_full_name }} - Práctica {{ practica.numero }}
+                                    {% if practica.vacante and practica.vacante.empresa %} ({{ practica.vacante.empresa.nombre }}){% endif %}
+                                </option>
+                            {% endfor %}
+                        </select>
+                        <small class="form-text text-muted">
+                            Solo se muestran prácticas en curso
+                        </small>
+                    </div>
+
+                    <div class="row mb-3">
+                        <div class="col-md-4">
+                            <div class="form-group">
+                                <label class="form-label"><i class="fas fa-calendar"></i> Fecha *</label>
+                                <input type="date" name="fecha" class="form-control" required>
+                            </div>
+                        </div>
+                        <div class="col-md-4">
+                            <div class="form-group">
+                                <label class="form-label"><i class="fas fa-clock"></i> Hora Inicio</label>
+                                <input type="time" name="hora_inicio" class="form-control">
+                            </div>
+                        </div>
+                        <div class="col-md-4">
+                            <div class="form-group">
+                                <label class="form-label"><i class="fas fa-clock"></i> Hora Fin</label>
+                                <input type="time" name="hora_fin" class="form-control">
+                            </div>
+                        </div>
+                    </div>
+
+                    <div class="form-group mb-3">
+                        <label class="form-label"><i class="fas fa-tag"></i> Tema del Encuentro *</label>
+                        <input type="text" name="tema" class="form-control"
+                               placeholder="Ej: Seguimiento de actividades de la semana 3" required>
+                    </div>
+
+                    <div class="form-group mb-3">
+                        <label class="form-label"><i class="fas fa-align-left"></i> Descripción *</label>
+                        <textarea name="descripcion" class="form-control" rows="5"
+                                  placeholder="Describe los temas tratados, avances del estudiante, observaciones generales..." required></textarea>
+                        <small class="form-text text-muted">
+                            Incluye detalles sobre el desempeño, logros y áreas de mejora
+                        </small>
+                    </div>
+
+                    <div class="form-group mb-3">
+                        <label class="form-label"><i class="fas fa-handshake"></i> Acuerdos y Compromisos</label>
+                        <textarea name="acuerdos" class="form-control" rows="4"
+                                  placeholder="Registra los acuerdos, compromisos y tareas para la próxima semana..."></textarea>
+                        <small class="form-text text-muted">
+                            Opcional: Define los compromisos para el siguiente encuentro
+                        </small>
+                    </div>
+
+                    <div class="alert alert-info">
+                        <i class="fas fa-info-circle"></i>
+                        <strong>Nota:</strong> Este encuentro quedará registrado como realizado con asistencia tanto del docente como del estudiante.
+                    </div>
+
+                    <div class="d-flex gap-3" style="margin-top: 30px;">
+                        <button type="submit" class="btn btn-primary">
+                            <i class="fas fa-save"></i> Registrar Encuentro
+                        </button>
+                        <a href="{% url 'practicas:encuentros_list' %}" class="btn btn-dark">
+                            <i class="fas fa-arrow-left"></i> Cancelar
+                        </a>
+                    </div>
+                </form>
+            </div>
+        </div>
+
+        {% if not practicas %}
+            <div class="alert alert-warning mt-4">
+                <i class="fas fa-exclamation-triangle"></i>
+                <strong>No tienes prácticas en curso.</strong>
+                Para registrar un encuentro, primero debe haber prácticas activas asignadas a ti.
+            </div>
+        {% endif %}
+    </div>
+</div>
+
+{% endblock %}
+
+{% block extra_js %}
+<script>
+    // Establecer fecha de hoy por defecto
+    document.addEventListener('DOMContentLoaded', function() {
+        const fechaInput = document.querySelector('input[name="fecha"]');
+        if (fechaInput && !fechaInput.value) {
+            const today = new Date().toISOString().split('T')[0];
+            fechaInput.value = today;
+        }
+    });
+</script>
+{% endblock %}
+

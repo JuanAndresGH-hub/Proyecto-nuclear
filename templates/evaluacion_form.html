@@ -1,0 +1,155 @@
+{% extends 'base.html' %}
+{% load static %}
+
+{% block title %}Crear Evaluación - Sistema de Gestión de Prácticas{% endblock %}
+
+{% block topbar_title %}Crear Evaluación{% endblock %}
+
+{% block content %}
+<div class="page-header">
+    <h1><i class="fas fa-star"></i> Crear Nueva Evaluación</h1>
+    <p>Registra una evaluación del desempeño del estudiante en su práctica</p>
+</div>
+
+<div class="row">
+    <div class="col-lg-8 mx-auto">
+        <div class="card">
+            <div class="card-header">
+                <h5 class="mb-0"><i class="fas fa-clipboard-check"></i> Información de la Evaluación</h5>
+            </div>
+            <div class="card-body">
+                <form method="POST" action="{% url 'practicas:evaluacion_create' %}">
+                    {% csrf_token %}
+
+                    <div class="form-group mb-3">
+                        <label class="form-label"><i class="fas fa-user-graduate"></i> Estudiante / Práctica *</label>
+                        <select name="practica" class="form-control" required id="practica-select">
+                            <option value="">Seleccione una práctica...</option>
+                            {% for practica in practicas %}
+                                <option value="{{ practica.pk }}">
+                                    {{ practica.estudiante.usuario.get_full_name }} - Práctica {{ practica.numero }}
+                                    {% if practica.vacante and practica.vacante.empresa %} ({{ practica.vacante.empresa.nombre }}){% endif %}
+                                </option>
+                            {% endfor %}
+                        </select>
+                        <small class="form-text text-muted">
+                            {% if not practicas %}
+                                No hay prácticas activas disponibles para evaluar.
+                            {% else %}
+                                Selecciona la práctica del estudiante que deseas evaluar
+                            {% endif %}
+                        </small>
+                    </div>
+
+                    <div class="row mb-3">
+                        <div class="col-md-6">
+                            <div class="form-group">
+                                <label class="form-label"><i class="fas fa-tag"></i> Rubro de Evaluación *</label>
+                                <select name="rubro" class="form-control" required>
+                                    <option value="Desempeño General">Desempeño General</option>
+                                    <option value="Asistencia y Puntualidad">Asistencia y Puntualidad</option>
+                                    <option value="Iniciativa y Proactividad">Iniciativa y Proactividad</option>
+                                    <option value="Trabajo en Equipo">Trabajo en Equipo</option>
+                                    <option value="Responsabilidad">Responsabilidad</option>
+                                    <option value="Calidad del Trabajo">Calidad del Trabajo</option>
+                                    <option value="Comunicación">Comunicación</option>
+                                    <option value="Resolución de Problemas">Resolución de Problemas</option>
+                                    <option value="Adaptabilidad">Adaptabilidad</option>
+                                    <option value="Conocimientos Técnicos">Conocimientos Técnicos</option>
+                                </select>
+                            </div>
+                        </div>
+                        <div class="col-md-6">
+                            <div class="form-group">
+                                <label class="form-label"><i class="fas fa-star"></i> Calificación (0.0 - 5.0) *</label>
+                                <input type="number" name="nota" class="form-control"
+                                       min="0" max="5" step="0.1" required
+                                       placeholder="Ej: 4.5">
+                                <small class="form-text text-muted">
+                                    Nota mínima aprobatoria: 3.5
+                                </small>
+                            </div>
+                        </div>
+                    </div>
+
+                    <div class="form-group mb-3">
+                        <label class="form-label"><i class="fas fa-comment-dots"></i> Comentarios y Observaciones</label>
+                        <textarea name="comentarios" class="form-control" rows="6"
+                                  placeholder="Describe el desempeño del estudiante, fortalezas, aspectos a mejorar, recomendaciones..."></textarea>
+                        <small class="form-text text-muted">
+                            Opcional: Proporciona retroalimentación detallada para ayudar al estudiante
+                        </small>
+                    </div>
+
+                    <div class="alert alert-info">
+                        <i class="fas fa-info-circle"></i>
+                        <strong>Nota:</strong> Esta evaluación se registrará como
+                        <strong>{% if user.es_docente %}Docente Asesor{% else %}Instructor de Empresa{% endif %}</strong>
+                        y se utilizará para calcular el promedio final de la práctica.
+                    </div>
+
+                    <div class="d-flex gap-3" style="margin-top: 30px;">
+                        <button type="submit" class="btn btn-primary">
+                            <i class="fas fa-save"></i> Guardar Evaluación
+                        </button>
+                        <a href="{% url 'practicas:evaluaciones_list' %}" class="btn btn-dark">
+                            <i class="fas fa-arrow-left"></i> Cancelar
+                        </a>
+                    </div>
+                </form>
+            </div>
+        </div>
+
+        <div class="card mt-4">
+            <div class="card-header">
+                <h5 class="mb-0"><i class="fas fa-info-circle"></i> Criterios de Evaluación</h5>
+            </div>
+            <div class="card-body">
+                <p class="mb-3">Usa la siguiente escala como referencia:</p>
+                <ul style="list-style: none; padding-left: 0;">
+                    <li style="margin-bottom: 8px;">
+                        <span class="badge" style="background-color: #198754; width: 60px; display: inline-block;">5.0</span>
+                        <strong>Excelente:</strong> Supera las expectativas constantemente
+                    </li>
+                    <li style="margin-bottom: 8px;">
+                        <span class="badge" style="background-color: #20c997; width: 60px; display: inline-block;">4.5</span>
+                        <strong>Muy Bueno:</strong> Cumple y frecuentemente supera las expectativas
+                    </li>
+                    <li style="margin-bottom: 8px;">
+                        <span class="badge" style="background-color: #0dcaf0; width: 60px; display: inline-block;">4.0</span>
+                        <strong>Bueno:</strong> Cumple las expectativas consistentemente
+                    </li>
+                    <li style="margin-bottom: 8px;">
+                        <span class="badge" style="background-color: #ffc107; width: 60px; display: inline-block;">3.5</span>
+                        <strong>Aceptable:</strong> Cumple las expectativas básicas
+                    </li>
+                    <li style="margin-bottom: 8px;">
+                        <span class="badge" style="background-color: #fd7e14; width: 60px; display: inline-block;">3.0</span>
+                        <strong>Regular:</strong> Necesita mejorar en algunos aspectos
+                    </li>
+                    <li style="margin-bottom: 8px;">
+                        <span class="badge" style="background-color: #dc3545; width: 60px; display: inline-block;">< 3.0</span>
+                        <strong>Deficiente:</strong> No cumple las expectativas
+                    </li>
+                </ul>
+            </div>
+        </div>
+    </div>
+</div>
+
+{% endblock %}
+
+{% block extra_js %}
+<script>
+    document.addEventListener('DOMContentLoaded', function() {
+        // Validar nota
+        const notaInput = document.querySelector('input[name="nota"]');
+        notaInput.addEventListener('input', function() {
+            const valor = parseFloat(this.value);
+            if (valor < 0) this.value = 0;
+            if (valor > 5) this.value = 5;
+        });
+    });
+</script>
+{% endblock %}
+

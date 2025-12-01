@@ -1,0 +1,269 @@
+{% extends 'base.html' %}
+{% load static %}
+
+{% block title %}{% if vacante %}Editar Vacante{% else %}Nueva Vacante{% endif %} - Sistema de Gestión de Prácticas{% endblock %}
+
+{% block topbar_title %}{% if vacante %}Editar Vacante{% else %}Nueva Vacante{% endif %}{% endblock %}
+
+{% block content %}
+<div class="page-header">
+    <h1>
+        <i class="fas fa-file-alt"></i>
+        {% if vacante %}Editar Vacante{% else %}Publicar Nueva Vacante{% endif %}
+    </h1>
+    <p>{% if vacante %}Actualiza la información de la vacante{% else %}Publica una nueva oportunidad de práctica{% endif %}</p>
+</div>
+
+<div class="card">
+    <div class="card-body">
+        <form method="POST" id="vacanteForm">
+            {% csrf_token %}
+
+            <div class="row">
+                <!-- Información Básica -->
+                <div class="col-md-6">
+                    <h5 class="mb-3"><i class="fas fa-info-circle"></i> Información Básica</h5>
+
+                    <div class="mb-3">
+                        <label for="empresa" class="form-label">Empresa <span class="text-danger">*</span></label>
+                        <select class="form-control" id="empresa" name="empresa" required>
+                            <option value="">Seleccione una empresa</option>
+                            {% for emp in empresas %}
+                            <option value="{{ emp.pk }}"
+                                {% if empresa_seleccionada and emp.pk == empresa_seleccionada.pk %}selected{% endif %}
+                                {% if vacante and emp.pk == vacante.empresa.pk %}selected{% endif %}>
+                                {{ emp.nombre }}
+                            </option>
+                            {% endfor %}
+                        </select>
+                    </div>
+
+                    <div class="mb-3">
+                        <label for="titulo" class="form-label">Título de la Vacante <span class="text-danger">*</span></label>
+                        <input type="text" class="form-control" id="titulo" name="titulo"
+                               value="{{ vacante.titulo|default:'' }}" required
+                               placeholder="Ej: Practicante de Desarrollo Web">
+                    </div>
+
+                    <div class="mb-3">
+                        <label for="modalidad" class="form-label">Modalidad <span class="text-danger">*</span></label>
+                        <select class="form-control" id="modalidad" name="modalidad" required>
+                            <option value="PRESENCIAL" {% if vacante.modalidad == 'PRESENCIAL' %}selected{% endif %}>Presencial</option>
+                            <option value="HIBRIDO" {% if vacante.modalidad == 'HIBRIDO' %}selected{% endif %}>Híbrido</option>
+                            <option value="REMOTO" {% if vacante.modalidad == 'REMOTO' %}selected{% endif %}>Remoto</option>
+                        </select>
+                    </div>
+
+                    <div class="row">
+                        <div class="col-md-6">
+                            <div class="mb-3">
+                                <label for="duracion_meses" class="form-label">Duración (meses) <span class="text-danger">*</span></label>
+                                <input type="number" class="form-control" id="duracion_meses" name="duracion_meses"
+                                       value="{{ vacante.duracion_meses|default:6 }}" min="1" max="12" required>
+                            </div>
+                        </div>
+                        <div class="col-md-6">
+                            <div class="mb-3">
+                                <label for="cantidad_plazas" class="form-label">N° Plazas <span class="text-danger">*</span></label>
+                                <input type="number" class="form-control" id="cantidad_plazas" name="cantidad_plazas"
+                                       value="{{ vacante.cantidad_plazas|default:1 }}" min="1" required>
+                            </div>
+                        </div>
+                    </div>
+
+                    <div class="mb-3">
+                        <label for="salario_rango" class="form-label">Rango Salarial</label>
+                        <input type="text" class="form-control" id="salario_rango" name="salario_rango"
+                               value="{{ vacante.salario_rango|default:'' }}"
+                               placeholder="Ej: $1.200.000 - $1.500.000">
+                        <small class="text-muted">Opcional</small>
+                    </div>
+                </div>
+
+                <!-- Fechas y Estado -->
+                <div class="col-md-6">
+                    <h5 class="mb-3"><i class="fas fa-calendar"></i> Fechas y Estado</h5>
+
+                    <div class="mb-3">
+                        <label for="fecha_inicio_estimada" class="form-label">Fecha Inicio Estimada <span class="text-danger">*</span></label>
+                        <input type="date" class="form-control" id="fecha_inicio_estimada" name="fecha_inicio_estimada"
+                               value="{{ vacante.fecha_inicio_estimada|date:'Y-m-d' }}" required>
+                    </div>
+
+                    <div class="mb-3">
+                        <label for="fecha_fin_estimada" class="form-label">Fecha Fin Estimada <span class="text-danger">*</span></label>
+                        <input type="date" class="form-control" id="fecha_fin_estimada" name="fecha_fin_estimada"
+                               value="{{ vacante.fecha_fin_estimada|date:'Y-m-d' }}" required>
+                    </div>
+
+                    {% if vacante %}
+                    <div class="mb-3">
+                        <label for="estado" class="form-label">Estado <span class="text-danger">*</span></label>
+                        <select class="form-control" id="estado" name="estado" required>
+                            <option value="ACTIVA" {% if vacante.estado == 'ACTIVA' %}selected{% endif %}>Activa</option>
+                            <option value="CERRADA" {% if vacante.estado == 'CERRADA' %}selected{% endif %}>Cerrada</option>
+                        </select>
+                        <small class="text-muted">Las vacantes cerradas no aparecen en búsquedas</small>
+                    </div>
+                    {% endif %}
+
+                    <div class="alert alert-info" style="margin-top: 20px;">
+                        <i class="fas fa-info-circle"></i>
+                        <strong>Nota:</strong> La vacante será publicada automáticamente al crearla.
+                        Los estudiantes podrán verla y postularse.
+                    </div>
+                </div>
+            </div>
+
+            <!-- Descripción y Perfil -->
+            <div class="row mt-3">
+                <div class="col-md-6">
+                    <h5 class="mb-3"><i class="fas fa-align-left"></i> Descripción</h5>
+                    <div class="mb-3">
+                        <label for="descripcion" class="form-label">Descripción de la Vacante <span class="text-danger">*</span></label>
+                        <textarea class="form-control" id="descripcion" name="descripcion"
+                                  rows="6" required placeholder="Describe las responsabilidades, actividades y objetivos de la práctica...">{{ vacante.descripcion|default:'' }}</textarea>
+                    </div>
+                </div>
+
+                <div class="col-md-6">
+                    <h5 class="mb-3"><i class="fas fa-user-check"></i> Perfil Requerido</h5>
+                    <div class="mb-3">
+                        <label for="perfil_requerido" class="form-label">Perfil del Candidato <span class="text-danger">*</span></label>
+                        <textarea class="form-control" id="perfil_requerido" name="perfil_requerido"
+                                  rows="6" required placeholder="Requisitos, habilidades, conocimientos y competencias necesarias...">{{ vacante.perfil_requerido|default:'' }}</textarea>
+                    </div>
+                </div>
+            </div>
+
+            <hr>
+
+            <!-- Botones -->
+            <div class="d-flex justify-content-between">
+                {% if vacante %}
+                <a href="{% url 'empresas:empresa_detail' vacante.empresa.pk %}" class="btn btn-secondary">
+                    <i class="fas fa-times"></i> Cancelar
+                </a>
+                {% else %}
+                <a href="{% if empresa_seleccionada %}{% url 'empresas:empresa_detail' empresa_seleccionada.pk %}{% else %}{% url 'empresas:empresas_list' %}{% endif %}" class="btn btn-secondary">
+                    <i class="fas fa-times"></i> Cancelar
+                </a>
+                {% endif %}
+                <button type="submit" class="btn btn-dark">
+                    <i class="fas fa-{% if vacante %}save{% else %}plus{% endif %}"></i>
+                    {% if vacante %}Guardar Cambios{% else %}Publicar Vacante{% endif %}
+                </button>
+            </div>
+        </form>
+    </div>
+</div>
+
+<style>
+    .page-header {
+        margin-bottom: 30px;
+    }
+
+    .page-header h1 {
+        font-size: 2rem;
+        margin-bottom: 10px;
+    }
+
+    .page-header p {
+        color: #6c757d;
+        margin: 0;
+    }
+
+    .card {
+        border: none;
+        box-shadow: 0 2px 4px rgba(0,0,0,0.1);
+    }
+
+    .form-label {
+        font-weight: 600;
+        margin-bottom: 8px;
+    }
+
+    .form-control:focus,
+    .form-select:focus {
+        border-color: #000;
+        box-shadow: 0 0 0 0.2rem rgba(0,0,0,0.1);
+    }
+
+    h5 i {
+        color: #198754;
+        margin-right: 8px;
+    }
+
+    .text-danger {
+        color: #dc3545 !important;
+    }
+
+    .btn-dark {
+        background-color: #000;
+        border-color: #000;
+    }
+
+    .btn-dark:hover {
+        background-color: #fff;
+        color: #000;
+        border-color: #000;
+        box-shadow: 0 2px 8px rgba(0,0,0,0.15);
+    }
+
+    .btn-secondary {
+        background-color: #6c757d;
+        border-color: #6c757d;
+    }
+
+    .btn-secondary:hover {
+        background-color: #fff;
+        color: #6c757d;
+        border-color: #6c757d;
+        box-shadow: 0 2px 8px rgba(0,0,0,0.15);
+    }
+
+    .alert-info {
+        background-color: #d1ecf1;
+        border-color: #bee5eb;
+        color: #0c5460;
+    }
+
+    textarea.form-control {
+        resize: vertical;
+    }
+</style>
+
+<script>
+document.getElementById('vacanteForm').addEventListener('submit', function(e) {
+    const empresa = document.getElementById('empresa').value;
+    const titulo = document.getElementById('titulo').value.trim();
+    const descripcion = document.getElementById('descripcion').value.trim();
+    const perfil_requerido = document.getElementById('perfil_requerido').value.trim();
+    const fecha_inicio = document.getElementById('fecha_inicio_estimada').value;
+    const fecha_fin = document.getElementById('fecha_fin_estimada').value;
+
+    if (!empresa || !titulo || !descripcion || !perfil_requerido || !fecha_inicio || !fecha_fin) {
+        e.preventDefault();
+        alert('Por favor completa todos los campos obligatorios');
+        return false;
+    }
+
+    // Validar que la fecha de fin sea posterior a la de inicio
+    if (fecha_fin <= fecha_inicio) {
+        e.preventDefault();
+        alert('La fecha de fin debe ser posterior a la fecha de inicio');
+        return false;
+    }
+});
+
+// Si no hay empresa seleccionada y solo hay una, seleccionarla automáticamente
+window.addEventListener('DOMContentLoaded', function() {
+    const empresaSelect = document.getElementById('empresa');
+    if (empresaSelect.options.length === 2 && !empresaSelect.value) {
+        empresaSelect.selectedIndex = 1;
+    }
+});
+</script>
+
+{% endblock %}
+

@@ -1,0 +1,362 @@
+{% extends 'base.html' %}
+{% load static %}
+
+{% block title %}Gestión de Encuestas - Sistema de Gestión de Prácticas{% endblock %}
+
+{% block topbar_title %}Gestión de Encuestas{% endblock %}
+
+{% block extra_css %}
+<style>
+.encuesta-card {
+    transition: all 0.3s ease;
+    height: 100%;
+}
+.encuesta-card:hover {
+    transform: translateY(-5px);
+    box-shadow: 0 8px 20px rgba(0,0,0,0.1);
+}
+.badge-custom {
+    padding: 8px 12px;
+    font-size: 0.85rem;
+    border-radius: 20px;
+}
+</style>
+{% endblock %}
+
+{% block content %}
+<div class="page-header">
+    <h1><i class="fas fa-poll"></i> Gestión de Encuestas</h1>
+    <p>Administra y monitorea las encuestas de evaluación del sistema</p>
+</div>
+
+<!-- Estadísticas -->
+<div class="row mb-4">
+    <div class="col-md-3">
+        <div class="card" style="border-top: 3px solid #0dcaf0;">
+            <div class="card-body text-center">
+                <i class="fas fa-poll" style="font-size: 2rem; color: #0dcaf0; opacity: 0.8; margin-bottom: 10px;"></i>
+                <h2 style="font-size: 2.5rem; margin-bottom: 10px; color: #0dcaf0;">
+                    {{ encuestas.count }}
+                </h2>
+                <p style="margin: 0; color: #6c757d; font-weight: 500;">Total Encuestas</p>
+            </div>
+        </div>
+    </div>
+    <div class="col-md-3">
+        <div class="card" style="border-top: 3px solid #198754;">
+            <div class="card-body text-center">
+                <i class="fas fa-check-circle" style="font-size: 2rem; color: #198754; opacity: 0.8; margin-bottom: 10px;"></i>
+                <h2 style="font-size: 2.5rem; margin-bottom: 10px; color: #198754;">
+                    {{ encuestas_activas }}
+                </h2>
+                <p style="margin: 0; color: #6c757d; font-weight: 500;">Activas</p>
+            </div>
+        </div>
+    </div>
+    <div class="col-md-3">
+        <div class="card" style="border-top: 3px solid #6f42c1;">
+            <div class="card-body text-center">
+                <i class="fas fa-users" style="font-size: 2rem; color: #6f42c1; opacity: 0.8; margin-bottom: 10px;"></i>
+                <h2 style="font-size: 2.5rem; margin-bottom: 10px; color: #6f42c1;">
+                    {{ total_respuestas }}
+                </h2>
+                <p style="margin: 0; color: #6c757d; font-weight: 500;">Respuestas</p>
+            </div>
+        </div>
+    </div>
+    <div class="col-md-3">
+        <div class="card" style="border-top: 3px solid #ffc107;">
+            <div class="card-body text-center">
+                <i class="fas fa-clock" style="font-size: 2rem; color: #ffc107; opacity: 0.8; margin-bottom: 10px;"></i>
+                <h2 style="font-size: 2.5rem; margin-bottom: 10px; color: #ffc107;">
+                    {{ pendientes_completar }}
+                </h2>
+                <p style="margin: 0; color: #6c757d; font-weight: 500;">Pendientes</p>
+            </div>
+        </div>
+    </div>
+</div>
+
+<!-- Filtros -->
+{% if user.es_coordinador %}
+<div class="card mb-4">
+    <div class="card-body">
+        <form method="GET" class="row g-3">
+            <div class="col-md-4">
+                <input type="text" name="search" class="form-control" placeholder="Buscar encuesta..." value="{{ request.GET.search }}">
+            </div>
+            <div class="col-md-3">
+                <select name="estado" class="form-select">
+                    <option value="">Todos los estados</option>
+                    <option value="activa">Activas</option>
+                    <option value="inactiva">Inactivas</option>
+                </select>
+            </div>
+            <div class="col-md-3">
+                <select name="rol" class="form-select">
+                    <option value="">Todos los roles</option>
+                    <option value="ESTUDIANTE">Estudiantes</option>
+                    <option value="INSTRUCTOR">Instructores</option>
+                    <option value="DOCENTE">Docentes</option>
+                </select>
+            </div>
+            <div class="col-md-2">
+                <button type="submit" class="btn btn-dark w-100">
+                    <i class="fas fa-filter"></i> Filtrar
+                </button>
+            </div>
+        </form>
+    </div>
+</div>
+{% endif %}
+
+<!-- Lista de Encuestas -->
+<div class="card">
+    <div class="card-header d-flex justify-content-between align-items-center" style="background: linear-gradient(135deg, #667eea 0%, #764ba2 100%); color: white;">
+        <h5 class="mb-0" style="font-weight: 600;"><i class="fas fa-list"></i> Encuestas Disponibles ({{ encuestas.count }})</h5>
+        {% if user.es_coordinador %}
+        <a href="/admin/encuestas/encuesta/add/" class="btn btn-light btn-sm">
+            <i class="fas fa-plus"></i> Nueva Encuesta
+        </a>
+        {% endif %}
+    </div>
+    <div class="card-body">
+        {% if encuestas %}
+            <div class="row">
+                {% for encuesta in encuestas %}
+                <div class="col-md-6 col-lg-4 mb-4">
+                    <div class="card encuesta-card" style="border: none; box-shadow: 0 2px 8px rgba(0,0,0,0.1);">
+                        <div class="card-body">
+                            <div class="d-flex justify-content-between align-items-start mb-3">
+                                <div style="flex: 1;">
+                                    <h5 class="card-title" style="font-weight: 600; color: #212529; margin-bottom: 5px;">
+                                        <i class="fas fa-clipboard-list" style="color: #667eea;"></i> {{ encuesta.titulo }}
+                                    </h5>
+                                </div>
+                                {% if encuesta.activa %}
+                                    <span class="badge badge-custom" style="background-color: #d1f0e3; color: #0f5130;">
+                                        <i class="fas fa-check-circle"></i> Activa
+                                    </span>
+                                {% else %}
+                                    <span class="badge badge-custom" style="background-color: #f8d7da; color: #842029;">
+                                        <i class="fas fa-times-circle"></i> Inactiva
+                                    </span>
+                                {% endif %}
+                            </div>
+
+                            <p class="card-text" style="color: #6c757d; font-size: 0.9rem; line-height: 1.6; min-height: 60px;">
+                                {{ encuesta.descripcion|truncatewords:15 }}
+                            </p>
+
+                            <hr style="margin: 15px 0; border-color: #e9ecef;">
+
+                            <div class="mb-3">
+                                <div class="d-flex align-items-center mb-2">
+                                    <i class="fas fa-calendar-alt" style="color: #0dcaf0; width: 20px;"></i>
+                                    <small style="color: #6c757d; font-size: 0.85rem;">
+                                        <strong>Inicio:</strong> {{ encuesta.fecha_inicio|date:"d M, Y" }}
+                                    </small>
+                                </div>
+                                <div class="d-flex align-items-center mb-2">
+                                    <i class="fas fa-calendar-times" style="color: #dc3545; width: 20px;"></i>
+                                    <small style="color: #6c757d; font-size: 0.85rem;">
+                                        <strong>Fin:</strong> {{ encuesta.fecha_fin|date:"d M, Y" }}
+                                    </small>
+                                </div>
+                                <div class="d-flex align-items-center">
+                                    <i class="fas fa-users" style="color: #198754; width: 20px;"></i>
+                                    <small style="color: #6c757d; font-size: 0.85rem;">
+                                        <strong>Para:</strong> {{ encuesta.dirigida_a_roles }}
+                                    </small>
+                                </div>
+                            </div>
+
+                            <div class="mb-3" style="background-color: #f8f9fa; padding: 10px; border-radius: 8px;">
+                                <div class="d-flex justify-content-between">
+                                    <small style="color: #6c757d; font-weight: 500;">
+                                        <i class="fas fa-clipboard-check" style="color: #667eea;"></i> Respuestas
+                                    </small>
+                                    <span style="font-weight: 700; color: #667eea; font-size: 1.1rem;">
+                                        {{ encuesta.respuestas_count|default:0 }}
+                                    </span>
+                                </div>
+                            </div>
+
+                            <div class="d-grid gap-2">
+                                <a href="{% url 'encuestas:encuesta_detail' encuesta.pk %}" class="btn btn-dark btn-sm">
+                                    <i class="fas fa-eye"></i> Ver Detalles
+                                </a>
+                                {% if user.es_coordinador %}
+                                <div class="btn-group" role="group">
+                                    <a href="/admin/encuestas/encuesta/{{ encuesta.pk }}/change/" class="btn btn-outline-dark btn-sm">
+                                        <i class="fas fa-edit"></i> Editar
+                                    </a>
+                                    <a href="#" class="btn btn-outline-dark btn-sm" onclick="verResultados({{ encuesta.pk }})">
+                                        <i class="fas fa-chart-bar"></i> Resultados
+                                    </a>
+                                </div>
+                                {% endif %}
+                            </div>
+                        </div>
+                    </div>
+                </div>
+                {% endfor %}
+            </div>
+        {% else %}
+            <div style="text-align: center; color: #6c757d; padding: 80px 20px;">
+                <i class="fas fa-poll" style="font-size: 4rem; color: #667eea; opacity: 0.3; margin-bottom: 20px; display: block;"></i>
+                <h5 style="color: #212529; margin-bottom: 15px; font-weight: 600;">No hay encuestas disponibles</h5>
+                <p style="margin-bottom: 25px;">
+                    {% if user.es_coordinador %}
+                        Crea encuestas para evaluar el desempeño y satisfacción en las prácticas.
+                    {% else %}
+                        No hay encuestas activas para tu rol en este momento.
+                    {% endif %}
+                </p>
+                {% if user.es_coordinador %}
+                <a href="/admin/encuestas/encuesta/add/" class="btn btn-dark">
+                    <i class="fas fa-plus"></i> Crear Primera Encuesta
+                </a>
+                {% endif %}
+            </div>
+        {% endif %}
+    </div>
+</div>
+
+<!-- Información Adicional -->
+{% if user.es_coordinador %}
+<div class="card mt-4">
+    <div class="card-header" style="background-color: #f8f9fa;">
+        <h5 class="mb-0" style="font-weight: 600;"><i class="fas fa-info-circle" style="color: #0dcaf0;"></i> Guía de Encuestas</h5>
+    </div>
+    <div class="card-body">
+        <div class="row">
+            <div class="col-md-4">
+                <div class="p-3" style="background-color: #e7f1ff; border-radius: 8px; height: 100%;">
+                    <h6 style="font-weight: 600; color: #004085; margin-bottom: 15px;">
+                        <i class="fas fa-user-graduate"></i> Encuestas para Estudiantes
+                    </h6>
+                    <ul style="font-size: 0.9rem; color: #495057; line-height: 1.8; margin: 0;">
+                        <li>Evaluación de prácticas empresariales</li>
+                        <li>Satisfacción con el instructor empresarial</li>
+                        <li>Evaluación de instalaciones y recursos</li>
+                        <li>Experiencia general de la práctica</li>
+                    </ul>
+                </div>
+            </div>
+            <div class="col-md-4">
+                <div class="p-3" style="background-color: #d1f0e3; border-radius: 8px; height: 100%;">
+                    <h6 style="font-weight: 600; color: #0f5130; margin-bottom: 15px;">
+                        <i class="fas fa-building"></i> Encuestas para Empresas/Instructores
+                    </h6>
+                    <ul style="font-size: 0.9rem; color: #495057; line-height: 1.8; margin: 0;">
+                        <li>Evaluación del desempeño del estudiante</li>
+                        <li>Competencias y habilidades desarrolladas</li>
+                        <li>Satisfacción con el programa académico</li>
+                        <li>Sugerencias de mejora continua</li>
+                    </ul>
+                </div>
+            </div>
+            <div class="col-md-4">
+                <div class="p-3" style="background-color: #fff3cd; border-radius: 8px; height: 100%;">
+                    <h6 style="font-weight: 600; color: #664d03; margin-bottom: 15px;">
+                        <i class="fas fa-chalkboard-teacher"></i> Encuestas para Docentes
+                    </h6>
+                    <ul style="font-size: 0.9rem; color: #495057; line-height: 1.8; margin: 0;">
+                        <li>Seguimiento académico del estudiante</li>
+                        <li>Evaluación de competencias adquiridas</li>
+                        <li>Valoración del proceso de práctica</li>
+                        <li>Retroalimentación para mejoras</li>
+                    </ul>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+
+<!-- Estadísticas Adicionales -->
+<div class="card mt-4">
+    <div class="card-header" style="background-color: #f8f9fa;">
+        <h5 class="mb-0" style="font-weight: 600;"><i class="fas fa-chart-line" style="color: #198754;"></i> Estadísticas de Participación</h5>
+    </div>
+    <div class="card-body">
+        <div class="row text-center">
+            <div class="col-md-3">
+                <div class="p-3">
+                    <i class="fas fa-percentage" style="font-size: 2rem; color: #667eea; margin-bottom: 10px;"></i>
+                    <h4 style="color: #667eea; margin: 10px 0; font-weight: 700;">85%</h4>
+                    <small style="color: #6c757d; font-weight: 500;">Tasa de Respuesta</small>
+                </div>
+            </div>
+            <div class="col-md-3">
+                <div class="p-3">
+                    <i class="fas fa-star" style="font-size: 2rem; color: #ffc107; margin-bottom: 10px;"></i>
+                    <h4 style="color: #ffc107; margin: 10px 0; font-weight: 700;">4.5/5</h4>
+                    <small style="color: #6c757d; font-weight: 500;">Satisfacción Promedio</small>
+                </div>
+            </div>
+            <div class="col-md-3">
+                <div class="p-3">
+                    <i class="fas fa-clock" style="font-size: 2rem; color: #0dcaf0; margin-bottom: 10px;"></i>
+                    <h4 style="color: #0dcaf0; margin: 10px 0; font-weight: 700;">5 min</h4>
+                    <small style="color: #6c757d; font-weight: 500;">Tiempo Promedio</small>
+                </div>
+            </div>
+            <div class="col-md-3">
+                <div class="p-3">
+                    <i class="fas fa-comments" style="font-size: 2rem; color: #198754; margin-bottom: 10px;"></i>
+                    <h4 style="color: #198754; margin: 10px 0; font-weight: 700;">120</h4>
+                    <small style="color: #6c757d; font-weight: 500;">Comentarios Recibidos</small>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+{% endif %}
+
+<div class="mt-4">
+    <a href="{% if user.es_coordinador %}{% url 'dashboard_coordinador' %}{% else %}{% url 'dashboard_estudiante' %}{% endif %}" class="btn btn-dark">
+        <i class="fas fa-arrow-left"></i> Volver al Dashboard
+    </a>
+</div>
+
+{% endblock %}
+
+{% block extra_js %}
+<script>
+// Efecto hover en tarjetas de encuestas
+document.querySelectorAll('.encuesta-card').forEach(card => {
+    card.addEventListener('mouseenter', function() {
+        this.style.transform = 'translateY(-8px)';
+        this.style.boxShadow = '0 12px 24px rgba(0,0,0,0.15)';
+    });
+
+    card.addEventListener('mouseleave', function() {
+        this.style.transform = 'translateY(0)';
+        this.style.boxShadow = '0 2px 8px rgba(0,0,0,0.1)';
+    });
+});
+
+// Función para ver resultados (placeholder)
+function verResultados(encuestaId) {
+    alert('Visualización de resultados de la encuesta #' + encuestaId + ' - Función en desarrollo');
+}
+
+// Animación de entrada para las tarjetas
+window.addEventListener('load', function() {
+    const cards = document.querySelectorAll('.encuesta-card');
+    cards.forEach((card, index) => {
+        setTimeout(() => {
+            card.style.opacity = '0';
+            card.style.transform = 'translateY(20px)';
+            setTimeout(() => {
+                card.style.transition = 'all 0.5s ease';
+                card.style.opacity = '1';
+                card.style.transform = 'translateY(0)';
+            }, 50);
+        }, index * 100);
+    });
+});
+</script>
+{% endblock %}
+

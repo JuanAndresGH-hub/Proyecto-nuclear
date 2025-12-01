@@ -1,0 +1,74 @@
+version: '3.8'
+
+services:
+  # Base de datos PostgreSQL
+  db:
+    image: postgres:15-alpine
+    container_name: proyecto_nuclear_db
+    environment:
+      POSTGRES_DB: proyecto_nuclear
+      POSTGRES_USER: admin
+      POSTGRES_PASSWORD: admin123
+      PGDATA: /var/lib/postgresql/data/pgdata
+    volumes:
+      - postgres_data:/var/lib/postgresql/data
+    ports:
+      - "5432:5432"
+    healthcheck:
+      test: ["CMD-SHELL", "pg_isready -U admin -d proyecto_nuclear"]
+      interval: 10s
+      timeout: 5s
+      retries: 5
+    networks:
+      - proyecto_network
+
+  # Aplicación Django
+  web:
+    build: .
+    container_name: proyecto_nuclear_web
+    command: >
+      sh -c "python manage.py migrate &&
+             python manage.py collectstatic --noinput &&
+             python manage.py runserver 0.0.0.0:8000"
+    volumes:
+      - .:/app
+      - static_volume:/app/staticfiles
+      - media_volume:/app/media
+    ports:
+      - "8000:8000"
+    environment:
+      DEBUG: "True"
+      DATABASE_URL: postgresql://admin:admin123@db:5432/proyecto_nuclear
+      DB_ENGINE: django.db.backends.postgresql
+      DB_NAME: proyecto_nuclear
+      DB_USER: admin
+      DB_PASSWORD: admin123
+      DB_HOST: db
+      DB_PORT: 5432
+    depends_on:
+      db:
+        condition: service_healthy
+    networks:
+      - proyecto_network
+
+  # Redis para caché (opcional pero recomendado)
+  redis:
+    image: redis:7-alpine
+    container_name: proyecto_nuclear_redis
+    ports:
+      - "6379:6379"
+    volumes:
+      - redis_data:/data
+    networks:
+      - proyecto_network
+
+volumes:
+  postgres_data:
+  static_volume:
+  media_volume:
+  redis_data:
+
+networks:
+  proyecto_network:
+    driver: bridge
+

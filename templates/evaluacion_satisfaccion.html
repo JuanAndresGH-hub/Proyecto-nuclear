@@ -1,0 +1,125 @@
+{% extends 'base.html' %}
+
+{% block title %}Evaluación de Satisfacción - Sistema de Gestión de Prácticas{% endblock %}
+
+{% block topbar_title %}Evaluación de Satisfacción{% endblock %}
+
+{% block content %}
+<div class="page-header">
+    <h1><i class="fas fa-star"></i> Encuesta de Satisfacción</h1>
+    <p>Encuestas FO-DO-028 y FO-DO-029 (requisito de cierre)</p>
+</div>
+
+<div class="card mb-4">
+    <div class="card-header">
+        <h5 class="mb-0">Encuesta de Satisfacción</h5>
+    </div>
+    <div class="card-body">
+        <p class="text-muted">Tu opinión sobre la práctica</p>
+
+        <form method="POST">
+            {% csrf_token %}
+            <!-- Pregunta 1 -->
+            <div class="form-group mb-4">
+                <h6>Satisfacción general con la práctica</h6>
+                <div style="display: flex; gap: 10px; align-items: center;">
+                    <label style="display: flex; align-items: center; gap: 5px; cursor: pointer;">
+                        <input type="radio" name="q1" value="1"> <span>1 Muy insatisfecho</span>
+                    </label>
+                    <label style="display: flex; align-items: center; gap: 5px; cursor: pointer;">
+                        <input type="radio" name="q1" value="2"> <span>2</span>
+                    </label>
+                    <label style="display: flex; align-items: center; gap: 5px; cursor: pointer;">
+                        <input type="radio" name="q1" value="3"> <span>3</span>
+                    </label>
+                    <label style="display: flex; align-items: center; gap: 5px; cursor: pointer;">
+                        <input type="radio" name="q1" value="4"> <span>4</span>
+                    </label>
+                    <label style="display: flex; align-items: center; gap: 5px; cursor: pointer;">
+                        <input type="radio" name="q1" value="5"> <span>5 Muy satisfecho</span>
+                    </label>
+                </div>
+            </div>
+
+            <!-- Pregunta 2 -->
+            <div class="form-group mb-4">
+                <h6>Aporte a tu formación profesional</h6>
+                <div style="display: flex; gap: 10px; align-items: center;">
+                    <label style="display: flex; align-items: center; gap: 5px; cursor: pointer;">
+                        <input type="radio" name="q2" value="1"> <span>1 Nulo</span>
+                    </label>
+                    <label style="display: flex; align-items: center; gap: 5px; cursor: pointer;">
+                        <input type="radio" name="q2" value="2"> <span>2</span>
+                    </label>
+                    <label style="display: flex; align-items: center; gap: 5px; cursor: pointer;">
+                        <input type="radio" name="q2" value="3"> <span>3</span>
+                    </label>
+                    <label style="display: flex; align-items: center; gap: 5px; cursor: pointer;">
+                        <input type="radio" name="q2" value="4"> <span>4</span>
+                    </label>
+                    <label style="display: flex; align-items: center; gap: 5px; cursor: pointer;">
+                        <input type="radio" name="q2" value="5"> <span>5 Muy significativo</span>
+                    </label>
+                </div>
+            </div>
+
+            <!-- Pregunta 3 -->
+            <div class="form-group mb-4">
+                <h6>Cumplimiento de expectativas</h6>
+                <div style="display: flex; gap: 10px; align-items: center;">
+                    <label style="display: flex; align-items: center; gap: 5px; cursor: pointer;">
+                        <input type="radio" name="q3" value="1"> <span>1 No cumplió</span>
+                    </label>
+                    <label style="display: flex; align-items: center; gap: 5px; cursor: pointer;">
+                        <input type="radio" name="q3" value="2"> <span>2</span>
+                    </label>
+                    <label style="display: flex; align-items: center; gap: 5px; cursor: pointer;">
+                        <input type="radio" name="q3" value="3"> <span>3</span>
+                    </label>
+                    <label style="display: flex; align-items: center; gap: 5px; cursor: pointer;">
+                        <input type="radio" name="q3" value="4"> <span>4</span>
+                    </label>
+                    <label style="display: flex; align-items: center; gap: 5px; cursor: pointer;">
+                        <input type="radio" name="q3" value="5"> <span>5 Totalmente</span>
+                    </label>
+                </div>
+            </div>
+
+            <!-- Pregunta 4 -->
+            <div class="form-group mb-4">
+                <h6>¿Recomendarías esta práctica/empresa?</h6>
+                <div style="display: flex; gap: 10px; align-items: center;">
+                    <label style="display: flex; align-items: center; gap: 5px; cursor: pointer;">
+                        <input type="radio" name="q4" value="1"> <span>1 No</span>
+                    </label>
+                    <label style="display: flex; align-items: center; gap: 5px; cursor: pointer;">
+                        <input type="radio" name="q4" value="2"> <span>2</span>
+                    </label>
+                    <label style="display: flex; align-items: center; gap: 5px; cursor: pointer;">
+                        <input type="radio" name="q4" value="3"> <span>3</span>
+                    </label>
+                    <label style="display: flex; align-items: center; gap: 5px; cursor: pointer;">
+                        <input type="radio" name="q4" value="4"> <span>4</span>
+                    </label>
+                    <label style="display: flex; align-items: center; gap: 5px; cursor: pointer;">
+                        <input type="radio" name="q4" value="5"> <span>5 Totalmente</span>
+                    </label>
+                </div>
+            </div>
+
+            <!-- Comentarios -->
+            <div class="form-group mb-4">
+                <h6>Comentarios y Sugerencias</h6>
+                <textarea class="form-control" rows="4" placeholder="Comparte tu experiencia, sugerencias o comentarios adicionales..."></textarea>
+            </div>
+
+            <button type="submit" class="btn btn-primary btn-lg w-100"><i class="fas fa-paper-plane"></i> Enviar Encuesta</button>
+        </form>
+    </div>
+</div>
+
+<div class="alert alert-info">
+    <i class="fas fa-info-circle"></i> <strong>Importante:</strong> Esta encuesta es confidencial y anónima. Tu opinión nos ayuda a mejorar el programa de prácticas.
+</div>
+{% endblock %}
+
