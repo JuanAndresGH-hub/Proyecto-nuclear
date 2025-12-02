@@ -17,6 +17,9 @@ services:
     region: oregon
     buildCommand: "chmod +x build.sh && ./build.sh"
     startCommand: "gunicorn config.wsgi:application"
+    disk:
+      name: media-disk
+      mountPath: /media/
     envVars:
       - key: PYTHON_VERSION
         value: "3.12.0"
