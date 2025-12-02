@@ -1,19 +1,20 @@
-services:
-  # Base de datos PostgreSQL
-  - type: postgres
-    name: practicas-db
+# Render Blueprint Configuration
+# Sistema de Gestión de Prácticas Profesionales
+
+databases:
+  - name: practicas-db
     databaseName: practicas_db
     user: practicas_user
     plan: free
     region: oregon
 
-  # Servicio Web (Django)
+services:
   - type: web
     name: practicas-web
-    runtime: python
+    env: python
+    branch: main
     plan: free
     region: oregon
-    branch: main
     buildCommand: "chmod +x build.sh && ./build.sh"
     startCommand: "gunicorn config.wsgi:application"
     envVars:
