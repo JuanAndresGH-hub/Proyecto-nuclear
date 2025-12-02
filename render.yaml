@@ -1,6 +1,6 @@
 services:
   # Base de datos PostgreSQL
-  - type: psgql
+  - type: postgres
     name: practicas-db
     databaseName: practicas_db
     user: practicas_user
@@ -31,4 +31,3 @@ services:
         fromDatabase:
           name: practicas-db
           property: connectionString
-
