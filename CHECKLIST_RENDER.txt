@@ -1,0 +1,178 @@
+═══════════════════════════════════════════════════════════════
+   ✅ CHECKLIST DE DESPLIEGUE EN RENDER
+   Sistema de Gestión de Prácticas Profesionales
+═══════════════════════════════════════════════════════════════
+
+📋 PREPARACIÓN (LOCAL)
+═══════════════════════════════════════════════════════════════
+
+✅ Archivos de configuración creados:
+   ✓ render.yaml
+   ✓ build.sh
+   ✓ runtime.txt
+   ✓ requirements.txt (actualizado)
+   ✓ config/settings.py (configurado para Render)
+   ✓ .gitignore
+
+═══════════════════════════════════════════════════════════════
+📤 SUBIR A GITHUB
+═══════════════════════════════════════════════════════════════
+
+[ ] 1. Inicializar Git (si no está inicializado)
+    Comando: git init
+
+[ ] 2. Agregar todos los archivos
+    Comando: git add .
+
+[ ] 3. Hacer commit
+    Comando: git commit -m "Initial commit para Render"
+
+[ ] 4. Crear repositorio en GitHub
+    URL: https://github.com/new
+    Nombre sugerido: sistema-practicas-profesionales
+
+[ ] 5. Conectar repositorio local con GitHub
+    Comando: git remote add origin https://github.com/TU_USUARIO/sistema-practicas-profesionales.git
+
+[ ] 6. Subir código
+    Comando: git push -u origin main
+
+═══════════════════════════════════════════════════════════════
+🌐 CONFIGURAR RENDER
+═══════════════════════════════════════════════════════════════
+
+[ ] 7. Crear cuenta en Render
+    URL: https://render.com/
+    Recomendado: Registrarse con GitHub
+
+[ ] 8. Crear Base de Datos PostgreSQL
+    - Hacer clic en "New +" → "PostgreSQL"
+    - Name: practicas-db
+    - Database: practicas_db
+    - User: practicas_user
+    - Region: Oregon (o el más cercano)
+    - Plan: Free
+    - GUARDAR la "Internal Database URL"
+
+[ ] 9. Crear Web Service
+    - Hacer clic en "New +" → "Web Service"
+    - Conectar tu repositorio de GitHub
+    - Name: practicas-web
+    - Branch: main
+    - Runtime: Python 3
+    - Build Command: ./build.sh
+    - Start Command: gunicorn config.wsgi:application
+    - Plan: Free
+
+═══════════════════════════════════════════════════════════════
+🔐 VARIABLES DE ENTORNO
+═══════════════════════════════════════════════════════════════
+
+[ ] 10. Configurar variables de entorno en Render:
+
+    PYTHON_VERSION = 3.12.0
+
+    SECRET_KEY = [generar en https://djecrety.ir/]
+
+    DEBUG = False
+
+    RENDER = True
+
+    DATABASE_URL = [copiar de PostgreSQL "Internal Database URL"]
+
+═══════════════════════════════════════════════════════════════
+🚀 DESPLEGAR
+═══════════════════════════════════════════════════════════════
+
+[ ] 11. Hacer clic en "Create Web Service"
+
+[ ] 12. Esperar a que el despliegue complete (5-10 minutos)
+
+[ ] 13. Verificar que el estado sea "Live" (círculo verde)
+
+═══════════════════════════════════════════════════════════════
+✅ VERIFICAR
+═══════════════════════════════════════════════════════════════
+
+[ ] 14. Abrir la URL de tu aplicación
+    URL: https://tu-app.onrender.com/login/
+
+[ ] 15. Probar login con usuarios de prueba:
+    - coordinador / 123456
+    - ana_martinez / 123456
+    - dr_garcia / 123456
+    - instructor_techcorp / 123456
+
+[ ] 16. Verificar que las funcionalidades básicas funcionen:
+    - Login ✓
+    - Dashboard ✓
+    - Navegación ✓
+    - Estilos CSS ✓
+
+═══════════════════════════════════════════════════════════════
+🔧 OPCIONAL: CONFIGURACIÓN ADICIONAL
+═══════════════════════════════════════════════════════════════
+
+[ ] 17. Crear superusuario para admin panel
+    - Ir a Shell en Render
+    - python manage.py createsuperuser
+    - Acceder a: https://tu-app.onrender.com/admin/
+
+[ ] 18. Configurar dominio personalizado (si tienes uno)
+    - Settings → Custom Domain
+
+[ ] 19. Configurar email para notificaciones
+    - Agregar variables EMAIL_* en Environment
+
+═══════════════════════════════════════════════════════════════
+📝 NOTAS IMPORTANTES
+═══════════════════════════════════════════════════════════════
+
+⚠️  PLAN GRATUITO - LIMITACIONES:
+
+   • El servicio se duerme después de 15 minutos de inactividad
+   • Primera carga puede tardar 30-60 segundos
+   • Base de datos: 1 GB de almacenamiento
+   • Los archivos media NO son persistentes
+   • 750 horas/mes de servicio
+   • 100 GB de ancho de banda/mes
+
+💡 CONSEJOS:
+
+   • Mantén la URL de tu app abierta para evitar que se duerma
+   • Usa un servicio como UptimeRobot para hacer ping cada 5 min
+   • Para archivos media persistentes, usa AWS S3 o Cloudinary
+   • Revisa los logs regularmente en la pestaña "Logs"
+   • Guarda backups de la base de datos periódicamente
+
+═══════════════════════════════════════════════════════════════
+🆘 SOLUCIÓN DE PROBLEMAS
+═══════════════════════════════════════════════════════════════
+
+Si algo falla:
+
+1. Revisar LOGS en Render (pestaña "Logs")
+2. Verificar que DATABASE_URL esté correcta
+3. Verificar que RENDER=True en variables de entorno
+4. Verificar que build.sh se haya ejecutado sin errores
+5. Consultar DESPLIEGUE_RENDER.md para más detalles
+
+═══════════════════════════════════════════════════════════════
+📚 RECURSOS
+═══════════════════════════════════════════════════════════════
+
+• Guía completa: DESPLIEGUE_RENDER.md
+• Documentación Render: https://render.com/docs
+• Soporte Render: https://render.com/docs/support
+
+═══════════════════════════════════════════════════════════════
+
+¡ÉXITO! Una vez completados todos los pasos, tu aplicación
+estará disponible públicamente en Internet 🎉
+
+URL de ejemplo: https://practicas-web-xxxx.onrender.com/login/
+
+═══════════════════════════════════════════════════════════════
+Fecha: 2 de Diciembre de 2025
+═══════════════════════════════════════════════════════════════
+

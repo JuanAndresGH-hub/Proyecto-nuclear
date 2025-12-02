@@ -13,6 +13,7 @@ https://docs.djangoproject.com/en/5.2/ref/settings/
 from pathlib import Path
 import os
 from dotenv import load_dotenv
+import dj_database_url
 
 # Cargar variables de entorno
 load_dotenv()
@@ -30,7 +31,13 @@ SECRET_KEY = os.getenv('SECRET_KEY', 'django-insecure-zjw^^%k-f(rg*&8trcwv-qt#^4
 # SECURITY WARNING: don't run with debug turned on in production!
 DEBUG = os.getenv('DEBUG', 'True') == 'True'
 
-ALLOWED_HOSTS = os.getenv('ALLOWED_HOSTS', 'localhost,127.0.0.1').split(',')
+# Configuracion para Render
+RENDER = os.getenv('RENDER', 'False') == 'True'
+
+if RENDER:
+    ALLOWED_HOSTS = ['*']  # Render maneja esto automaticamente
+else:
+    ALLOWED_HOSTS = os.getenv('ALLOWED_HOSTS', 'localhost,127.0.0.1').split(',')
 
 
 # Application definition
@@ -55,6 +62,7 @@ INSTALLED_APPS = [
 
 MIDDLEWARE = [
     'django.middleware.security.SecurityMiddleware',
+    'whitenoise.middleware.WhiteNoiseMiddleware',  # WhiteNoise para archivos estaticos
     'django.contrib.sessions.middleware.SessionMiddleware',
     'django.middleware.common.CommonMiddleware',
     'django.middleware.csrf.CsrfViewMiddleware',
@@ -87,11 +95,17 @@ WSGI_APPLICATION = 'config.wsgi.application'
 # Database
 # https://docs.djangoproject.com/en/5.2/ref/settings/#databases
 
-# Usar PostgreSQL solo si el HOST es 'db' (Docker)
-# Por defecto usar SQLite para desarrollo local
-db_host = os.getenv('DB_HOST', 'localhost')
-
-if db_host == 'db' and os.getenv('DB_ENGINE') == 'django.db.backends.postgresql':
+# Configuracion para Render con PostgreSQL
+if os.getenv('DATABASE_URL'):
+    # Usar DATABASE_URL para Render u otros servicios en la nube
+    DATABASES = {
+        'default': dj_database_url.config(
+            default=os.getenv('DATABASE_URL'),
+            conn_max_age=600,
+            conn_health_checks=True,
+        )
+    }
+elif os.getenv('DB_HOST') == 'db' and os.getenv('DB_ENGINE') == 'django.db.backends.postgresql':
     # PostgreSQL para Docker
     DATABASES = {
         'default': {
@@ -148,11 +162,14 @@ USE_TZ = True
 # Static files (CSS, JavaScript, Images)
 # https://docs.djangoproject.com/en/5.2/howto/static-files/
 
-STATIC_URL = 'static/'
+STATIC_URL = '/static/'
 STATICFILES_DIRS = [BASE_DIR / 'static']
 STATIC_ROOT = BASE_DIR / 'staticfiles'
 
-MEDIA_URL = 'media/'
+# Configuracion de WhiteNoise para archivos estaticos
+STATICFILES_STORAGE = 'whitenoise.storage.CompressedManifestStaticFilesStorage'
+
+MEDIA_URL = '/media/'
 MEDIA_ROOT = BASE_DIR / 'media'
 
 # Default primary key field type
@@ -189,18 +206,32 @@ CSRF_TRUSTED_ORIGINS = [
     "http://127.0.0.1:3000",
 ]
 
-CSRF_COOKIE_SECURE = False  # True en producción con HTTPS
+# Agregar dominios de Render a CSRF_TRUSTED_ORIGINS si estamos en produccion
+if RENDER:
+    CSRF_TRUSTED_ORIGINS.extend([
+        'https://*.onrender.com',
+    ])
+
+CSRF_COOKIE_SECURE = RENDER  # True en producción con HTTPS
 CSRF_COOKIE_HTTPONLY = False  # False para que JavaScript pueda acceder si es necesario
 CSRF_COOKIE_AGE = 31449600  # Un año
 CSRF_COOKIE_SAMESITE = 'Lax'  # Permite enviar cookie en formularios POST
 CSRF_USE_SESSIONS = False  # Usar cookies en lugar de sesiones para CSRF
 CSRF_COOKIE_NAME = 'csrftoken'  # Nombre explícito de la cookie
 
-SESSION_COOKIE_SECURE = False  # True en producción con HTTPS
+SESSION_COOKIE_SECURE = RENDER  # True en producción con HTTPS
 SESSION_COOKIE_HTTPONLY = True
 SESSION_COOKIE_SAMESITE = 'Lax'  # Permite enviar cookie en formularios POST
 SESSION_COOKIE_AGE = 1209600  # 2 semanas
 SESSION_SAVE_EVERY_REQUEST = True  # Guardar sesión en cada request
+
+# Configuraciones de seguridad para produccion (Render)
+if RENDER:
+    SECURE_SSL_REDIRECT = True
+    SECURE_PROXY_SSL_HEADER = ('HTTP_X_FORWARDED_PROTO', 'https')
+    SECURE_HSTS_SECONDS = 31536000  # 1 año
+    SECURE_HSTS_INCLUDE_SUBDOMAINS = True
+    SECURE_HSTS_PRELOAD = True
 
 ALLOWED_HOSTS = ['*']  # En desarrollo; restringir en producción
 
